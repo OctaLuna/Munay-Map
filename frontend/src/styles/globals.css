@@ -1,0 +1,88 @@
+/* globals.css — Estilos base de la app */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Skip to main content — accesibilidad */
+  .skip-link {
+    @apply absolute -top-full left-4 z-[600] rounded-b-lg bg-primary px-4 py-2 text-sm font-medium text-surface transition-all;
+    @apply focus:top-0;
+  }
+
+  /* Tipografía base */
+  html {
+    -webkit-text-size-adjust: 100%;
+    font-feature-settings: "kern" 1;
+  }
+
+  body {
+    @apply bg-background font-sans text-dark antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Headings en serif por defecto */
+  h1, h2, h3, h4 {
+    @apply font-serif;
+  }
+
+  /* Focus visible consistente */
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary ring-offset-2;
+  }
+
+  /* Scroll suave */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  /* Reducción de movimiento — override para GSAP */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* Selección de texto con colores de marca */
+  ::selection {
+    @apply bg-primary/20 text-dark;
+  }
+
+  /* Scrollbar minimal */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-background;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-neutral/30;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-neutral/50;
+  }
+}
+
+@layer components {
+  /* Prose — texto largo legible */
+  .prose-bolivia {
+    @apply max-w-prose-wide font-sans text-base leading-relaxed text-dark;
+  }
+
+  .prose-bolivia p {
+    @apply mb-4 [text-wrap:pretty];
+  }
+
+  /* Foco visible para links en prose */
+  .prose-bolivia a {
+    @apply text-primary underline decoration-primary/30 underline-offset-2;
+    @apply hover:decoration-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary;
+  }
+}

@@ -1,0 +1,9 @@
+/* fonts.css — Carga de fuentes de Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,700&family=Inter:wght@400;500;600;700&display=swap');
+
+/*
+ * Fallback para caracteres no latinos (japonés, árabe, coreano, etc.)
+ * Google Fonts carga Noto automáticamente para caracteres fuera del
+ * subset de Fraunces/Inter, pero especificamos el fallback explícito
+ * para garantizar que el sistema funcione sin conexión (PWA).
+ */
