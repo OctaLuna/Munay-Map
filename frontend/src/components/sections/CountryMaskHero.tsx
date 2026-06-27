@@ -5,8 +5,6 @@ import { BOLIVIA_SUBTRACT_PATH, BOLIVIA_MASK_PATH, MASK_VIEWBOX } from '@/assets
 import { BOLIVIA_DEPARTMENTS, DEPT_FIT_TRANSFORM } from '@/assets/masks/boliviaDepartments'
 import { prefersReducedMotion } from '@/lib/utils'
 import { SplitHeading } from '@/components/motion/SplitHeading'
-import { Button } from '@/components/ui/Button'
-import { Link } from 'react-router-dom'
 import { useT } from '@/context/LanguageContext'
 import beniTexture from '@/assets/departments/beni.jpg'
 import cochabambaTexture from '@/assets/departments/cochabamba.jpg'
@@ -248,25 +246,6 @@ export function CountryMaskHero({
               {t('hero.title')}
             </SplitHeading>
 
-            <div className="pointer-events-auto flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-              <Link to="/camara">
-                <Button
-                  size="lg"
-                  className="bg-dark text-surface hover:bg-dark/80 border-dark rounded-full px-8"
-                >
-                  {t('hero.cta.discover')}
-                </Button>
-              </Link>
-              <Link to="/quiz">
-                <Button
-                  size="lg"
-                  variant="secondary"
-                  className="border-dark/30 text-dark hover:bg-dark/5 rounded-full px-8"
-                >
-                  {t('hero.cta.quiz')}
-                </Button>
-              </Link>
-            </div>
           </div>
 
           <div

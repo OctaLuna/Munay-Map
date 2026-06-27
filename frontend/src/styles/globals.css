@@ -84,9 +84,9 @@
     border-radius: 1rem;
     background: radial-gradient(
       ellipse at center,
-      rgba(255, 255, 255, 0.6) 0%,
-      rgba(255, 255, 255, 0.48) 54%,
-      rgba(255, 255, 255, 0.42) 78%,
+      rgba(255, 255, 255, 0.38) 0%,
+      rgba(255, 255, 255, 0.28) 54%,
+      rgba(255, 255, 255, 0.20) 78%,
       rgba(255, 255, 255, 0) 100%
     );
     filter: blur(2px);
