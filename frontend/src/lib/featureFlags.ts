@@ -11,7 +11,7 @@
  * Decisión de arquitectura: usar una constante en lugar de una variable de entorno
  * para el switch permite que TypeScript elimine el código no usado en build (tree-shaking).
  *
- * Valor actual: false → usa el backend NestJS real (http://localhost:3000/api)
+ * Valor actual: false → usa el backend NestJS real (http://localhost:3000)
  * Para volver al mock: cambiar a true (útil cuando el backend no está corriendo)
  */
 export const USE_MOCK_DATA = false

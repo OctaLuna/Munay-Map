@@ -647,14 +647,23 @@ Cada `ItinerarioDia` enlaza un sitio (`siteId` → `/biblioteca/:id`), un tema, 
   navegador (Playwright) → `/quiz/resultado` renderiza la guía con itinerario de 3 días
   ordenado por región, presupuesto y época derivados, **sin errores de consola**
 
-### Hallazgo pendiente (preexistente, fuera del alcance de esta función)
+### Fix de integración: base URL del cliente (`/api` → sin prefijo) — 27/06/2026
 
-El cliente del frontend usa base `http://localhost:3000/api`, pero el backend **no define
-`setGlobalPrefix('api')`** (sus rutas son `/quiz/...`, `/health`, etc.). Con `USE_MOCK_DATA=false`
-y la base por defecto, las llamadas darían 404. Para la verificación se apuntó el frontend a
-`VITE_API_BASE_URL=http://localhost:3001` (sin `/api`) y funcionó. **Recomendación:** agregar
-`app.setGlobalPrefix('api')` en `backend/src/main.ts` **o** ajustar la base del cliente. No se
-modificó aquí por estar fuera del alcance de esta función y poder afectar tests/deploy.
+**Síntoma:** `GET http://localhost:3000/api/quiz/questions → 404` al cargar el quiz.
+
+**Causa:** el cliente del frontend usaba base `http://localhost:3000/api`, pero el backend
+expone las rutas **sin prefijo** (`/quiz/...`, `/catalog/...`, `/health`). Esto es lo intencional:
+los 35 tests Playwright del backend usan `baseURL: http://localhost:3000` y llaman `/quiz/...`
+sin `/api`, el healthcheck es `/health`, y el documento técnico lista las rutas sin `/api`.
+Agregar `setGlobalPrefix('api')` habría roto esos 35 tests y el healthcheck.
+
+**Fix (lado frontend):**
+- `frontend/src/services/api/client.ts` — base por defecto `http://localhost:3000` (sin `/api`)
+- `frontend/.env.example` — `VITE_API_BASE_URL=http://localhost:3000`
+- `frontend/src/lib/featureFlags.ts` — comentario actualizado
+
+**Verificación:** contra el backend vivo en `:3000`, `GET /quiz/questions → 200` y
+`GET /api/quiz/questions → 404` (el error original). `tsc -b` exit 0 · Vitest 22/22.
 
 
 ---
