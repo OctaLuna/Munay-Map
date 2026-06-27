@@ -5,9 +5,9 @@
  * Configurar VITE_API_BASE_URL en .env.local y cambiar USE_MOCK_DATA a false.
  */
 
-// El backend NestJS expone las rutas sin prefijo (/quiz/..., /catalog/...,
-// /health), igual que su baseURL de tests. NO usar sufijo /api aquí.
-const BASE_URL = import.meta.env['VITE_API_BASE_URL'] ?? 'http://localhost:3000'
+// BASE_URL vacío → same-origin (Vite proxy en dev reenvía /catalog, /recognize, etc.)
+// En producción configurar VITE_API_BASE_URL a la URL de Cloud Run.
+const BASE_URL = (import.meta.env['VITE_API_BASE_URL'] as string | undefined) ?? ''
 
 export class ApiError extends Error {
   status: number

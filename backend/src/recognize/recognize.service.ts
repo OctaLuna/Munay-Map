@@ -30,11 +30,21 @@ export class RecognizeService {
   async recognize(dto: RecognizeRequestDto): Promise<RecognizeResult> {
     this.logger.log(`Processing recognition request (idioma: ${dto.idioma})`);
 
-    // Step 1: Vision AI
-    const visionResult = await this.visionService.analyzeImage(dto.imageBase64);
-    this.logger.log(
-      `Vision labels: ${visionResult.labels.join(', ')} | landmark: ${visionResult.landmark?.name ?? 'none'}`,
-    );
+    // Step 1: Vision AI — wrapped so a Vision failure doesn't kill the whole request.
+    // Gemini can still describe the image directly from the base64.
+    let visionResult: Awaited<ReturnType<VisionServicePort['analyzeImage']>> = {
+      labels: [],
+      landmark: undefined,
+      detectedText: [],
+    };
+    try {
+      visionResult = await this.visionService.analyzeImage(dto.imageBase64);
+      this.logger.log(
+        `Vision labels: ${visionResult.labels.join(', ')} | landmark: ${visionResult.landmark?.name ?? 'none'}`,
+      );
+    } catch (visionErr) {
+      this.logger.warn('Vision AI failed — proceeding with Gemini only', visionErr);
+    }
 
     // Step 2: Match site from catalog
     let site: Site | null = null;

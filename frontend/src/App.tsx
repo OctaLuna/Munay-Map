@@ -7,6 +7,7 @@ import HomePage from '@/pages/Home'
 import LibraryPage from '@/pages/Library'
 import SiteDetailPage from '@/pages/Library/SiteDetail'
 import AboutPage from '@/pages/About'
+import CameraPage from '@/pages/CameraPage'
 import CameraIntro from '@/pages/Capture/CameraIntro'
 import CameraView from '@/pages/Capture/CameraView'
 import Processing from '@/pages/Capture/Processing'
@@ -34,7 +35,8 @@ export default function App() {
         <Route path="/biblioteca" element={<LibraryPage />} />
         <Route path="/biblioteca/:id" element={<SiteDetailPage />} />
         <Route path="/sobre-nosotros" element={<AboutPage />} />
-        <Route path="/camara" element={<CameraIntro />} />
+        <Route path="/camara" element={<CameraPage />} />
+        <Route path="/camara/intro" element={<CameraIntro />} />
         <Route path="/camara/view" element={<CameraView />} />
         <Route path="/camara/processing" element={<Processing />} />
         <Route path="/camara/result" element={<RecognizeResult />} />

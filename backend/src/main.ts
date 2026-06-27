@@ -7,9 +7,10 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // Disable built-in body parser so we can set a 10mb limit for base64 images
+  const app = await NestFactory.create(AppModule, { bodyParser: false });
 
-  // Body size limit for base64 images
+  // Body size limit — must be registered before NestJS pipes/guards
   app.use(json({ limit: '10mb' }));
 
   // Global validation pipe
