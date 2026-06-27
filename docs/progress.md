@@ -507,6 +507,101 @@ Documentado en la sección `### 2. Efecto de scroll del hero — arquitectura fi
 
 ---
 
+## Cambios del 27/06/2026 — Sesión 3: Técnicas cinematográficas Flyward
+
+**Objetivo:** llevar el Home más cerca del lenguaje visual de Flyward, manteniendo
+la paleta Munay Map y la silueta real de Bolivia (`Subtract (1).svg`).
+
+### 1. `CinematicSky.tsx` — sección nueva (equivalente a "Travel Simple")
+
+Sección full-viewport (`h-[105vh]`) con composición por capas, insertada en el Home
+entre "El problema que resolvemos" y `JourneySteps` (`data-nav-theme="dark"`).
+
+| Capa | Técnica | Detalle |
+|---|---|---|
+| Cielo | `linear-gradient` + `clip-path: polygon` | Atardecer andino (Dorado Inti → Vino Tierra → Carbón) con borde inferior de cordillera |
+| Resplandor solar | `radial-gradient` | Foco cálido bajo, centrado |
+| Ala de cóndor | 2 `<polygon>` SVG superpuestos | Reemplaza el "ala de avión" de Flyward por un motivo andino |
+| Ruta de vuelo | `stroke-dashoffset` + `getTotalLength()` | Curva bézier dibujada ligada al scroll (`scrub: 1.5`), con paradas |
+| Texto fantasma | `clamp()` + opacidad 0.07 + parallax `xPercent` | "Patrimonio vivo" decorativo |
+| Borde inferior | `clip-path: polygon` (papel rasgado) | Transición al fondo beige de la sección siguiente |
+
+Parallax del cielo (`yPercent: -14`, `scrub: 1`). Todo respeta `prefers-reduced-motion`
+(sin parallax; la ruta aparece ya dibujada).
+
+### 2. `JourneySteps.tsx` — rediseño al patrón "How We Support"
+
+Reemplazado el scroll pineado por la grilla 2×2 escalonada de Flyward (pasos 2 y 4 con
+`md:mt-16`), conectada por un **camino dorado dibujado a mano** (`#journey-path`):
+
+- `getTotalLength()` + `strokeDasharray`/`strokeDashoffset` animado con `scrub: 1.5`.
+- Números de paso con rebote elástico `ease: 'back.out(1.8)'` (`scale 0→1`).
+- Reveal por tarjeta (`power2.out`, `toggleActions: 'play none none none'`).
+- Fondo: silueta real de Bolivia (`BOLIVIA_MASK_PATH`) a opacidad `0.05` como textura.
+- Camino oculto en mobile (`hidden md:block`); grilla colapsa a una columna.
+
+### 3. Verificación post-sesión 3 (27/06/2026)
+
+- **Typecheck:** `tsc -b` exit 0
+- **Build:** producción limpia, 0 errores TypeScript
+- **Tests:** 16/16 pasando (sin cambios en suites)
+- **Verificación visual:** Playwright (1440×900) — hero, sección cinematográfica y pasos
+  confirmados sin errores de consola
+- **Lint:** los `no-undef` de tipos DOM (`HTMLElement`, `SVGPathElement`) son un hueco
+  preexistente de la config de ESLint (afecta también a `CountryMaskHero`/`StatsCounter`),
+  no una regresión de esta sesión
+
+
+---
+
+## Cambios del 27/06/2026 — Sesión 4: DevOps (CI/CD + contenedores)
+
+**Objetivo:** cerrar la sección 8 (Despliegue/DevOps) del documento técnico definitivo,
+que estaba documentada pero sin implementar en el repo.
+
+### Estado de conformidad con el documento técnico definitivo
+
+Auditado el backend contra el documento: **ya conforma la arquitectura modular** descrita.
+Presentes y cableados en `app.module.ts`: `HealthModule`, `CatalogModule`, `VisionModule`,
+`GeminiModule`, `TtsModule`, `RecognizeModule`, `ChatModule`, `QuizModule`, `ThrottlerModule`
+(rate limiting 60/min) y `ConfigModule`. Cada servicio externo tiene par mock/real.
+
+### Archivos nuevos
+
+| Archivo | Rol |
+|---|---|
+| `frontend/Dockerfile` | Build multi-stage (node:20-alpine → nginx:1.27-alpine), Cloud Run-aware (`${PORT}`) |
+| `frontend/nginx.conf.template` | Config SPA: fallback a `index.html`, `sw.js` sin caché, assets con caché inmutable, gzip |
+| `frontend/.dockerignore` | Excluye `node_modules`, `dist`, `.env`, etc. del contexto de build |
+| `.github/workflows/ci.yml` | CI: build + tests de backend (Jest) y frontend (Vitest) en push/PR |
+| `.github/workflows/deploy-cloudrun.yml` | Deploy manual a Cloud Run vía Artifact Registry + Workload Identity Federation |
+
+### Decisiones
+
+- **Monorepo (pnpm + Turborepo + `packages/shared-types`):** el documento lo describe como
+  estructura objetivo, pero el repo usa carpetas separadas `frontend/` y `backend/`. **No se
+  forzó** la migración en esta sesión: es una reestructuración mayor y de alto riesgo que no
+  fue solicitada explícitamente. Divergencia consciente, documentada aquí.
+- **Workload Identity Federation** en el deploy en lugar de clave JSON en el repo, alineado con
+  la sección 6 ("API keys ... nunca hardcodeadas en el repositorio").
+- **Frontend con nginx** (no servidor Node): la PWA compila a estáticos; nginx + `envsubst` del
+  `${PORT}` es el patrón estándar y liviano para Cloud Run.
+
+### Verificación post-sesión 4 (27/06/2026)
+
+- **Backend:** `nest build` exit 0 · **Jest 27/27** tests pasando
+- **Frontend:** `vite build` limpio · **Vitest 16/16** pasando
+- **Workflows:** YAML válido (parseado con `js-yaml`)
+- **Docker:** **no validado en esta sesión** — el daemon de Docker Desktop no estaba corriendo
+  (solo respondía el cliente). El `frontend/Dockerfile` sigue el patrón multi-stage ya verificado
+  del `backend/Dockerfile` + el mecanismo estándar de plantillas de `nginx:alpine`. Pendiente:
+  `docker build ./frontend` y smoke test (`-e PORT=8080`) cuando el daemon esté disponible
+- **Seguridad:** `backend/.env` confirmado fuera de git (`.gitignore:22`); contiene secretos
+  locales reales — **no commitear**. Pendiente real: mover a Google Secret Manager en deploy.
+
+
+---
+
 ## Backend NestJS — Completado el 26 de junio de 2026
 
 ### Tecnologías

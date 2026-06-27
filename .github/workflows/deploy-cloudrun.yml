@@ -1,0 +1,86 @@
+# Deploy — backend y frontend a Google Cloud Run (seccion 8 del documento tecnico).
+#
+# Disparo MANUAL (workflow_dispatch) para evitar despliegues accidentales.
+# Flujo: auth -> build & push a Artifact Registry -> deploy a Cloud Run.
+#
+# Requiere configurar en el repo (Settings -> Secrets and variables -> Actions):
+#   Variables:
+#     GCP_PROJECT_ID            ID del proyecto (ej. munay-map)
+#     GCP_REGION               region (ej. us-central1)
+#     GAR_REPOSITORY           repo de Artifact Registry (ej. munay-map)
+#     CLOUD_RUN_BACKEND        nombre del servicio backend
+#     CLOUD_RUN_FRONTEND       nombre del servicio frontend
+#   Secrets:
+#     GCP_WORKLOAD_IDENTITY_PROVIDER   provider de Workload Identity Federation
+#     GCP_SERVICE_ACCOUNT              email de la cuenta de servicio de deploy
+#
+# Se usa Workload Identity Federation (sin claves JSON en el repo), alineado
+# con la seccion 6: "API keys ... nunca hardcodeadas en el repositorio".
+
+name: Deploy to Cloud Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Que desplegar
+        type: choice
+        default: both
+        options: [both, backend, frontend]
+
+permissions:
+  contents: read
+  id-token: write # necesario para Workload Identity Federation
+
+jobs:
+  deploy:
+    name: Build & deploy
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_BASE: ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.GAR_REPOSITORY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: auth
+        name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ vars.GCP_REGION }}-docker.pkg.dev --quiet
+
+      # ── Backend ───────────────────────────────────────────────
+      - name: Build & push backend
+        if: ${{ github.event.inputs.target == 'both' || github.event.inputs.target == 'backend' }}
+        run: |
+          docker build -t "$IMAGE_BASE/backend:${{ github.sha }}" ./backend
+          docker push "$IMAGE_BASE/backend:${{ github.sha }}"
+
+      - name: Deploy backend to Cloud Run
+        if: ${{ github.event.inputs.target == 'both' || github.event.inputs.target == 'backend' }}
+        run: |
+          gcloud run deploy "${{ vars.CLOUD_RUN_BACKEND }}" \
+            --image "$IMAGE_BASE/backend:${{ github.sha }}" \
+            --region "${{ vars.GCP_REGION }}" \
+            --platform managed \
+            --allow-unauthenticated
+
+      # ── Frontend ──────────────────────────────────────────────
+      - name: Build & push frontend
+        if: ${{ github.event.inputs.target == 'both' || github.event.inputs.target == 'frontend' }}
+        run: |
+          docker build -t "$IMAGE_BASE/frontend:${{ github.sha }}" ./frontend
+          docker push "$IMAGE_BASE/frontend:${{ github.sha }}"
+
+      - name: Deploy frontend to Cloud Run
+        if: ${{ github.event.inputs.target == 'both' || github.event.inputs.target == 'frontend' }}
+        run: |
+          gcloud run deploy "${{ vars.CLOUD_RUN_FRONTEND }}" \
+            --image "$IMAGE_BASE/frontend:${{ github.sha }}" \
+            --region "${{ vars.GCP_REGION }}" \
+            --platform managed \
+            --allow-unauthenticated

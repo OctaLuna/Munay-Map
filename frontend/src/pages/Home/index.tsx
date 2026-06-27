@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { CountryMaskHero } from '@/components/sections/CountryMaskHero'
+import { CinematicSky } from '@/components/sections/CinematicSky'
 import { JourneySteps } from '@/components/sections/JourneySteps'
 import { StatsCounter } from '@/components/sections/StatsCounter'
 import { TwoColumnsRagged } from '@/components/sections/TwoColumnsRagged'
@@ -58,7 +59,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 3. JourneySteps — fondo beige con lineas de mapa, texto oscuro */}
+      {/* 3. Seccion cinematografica — atardecer andino + ala de condor, texto claro */}
+      <div data-nav-theme="dark">
+        <CinematicSky />
+      </div>
+
+      {/* 4. JourneySteps — fondo beige con silueta de Bolivia, texto oscuro */}
       <div data-nav-theme="light">
         <JourneySteps />
       </div>

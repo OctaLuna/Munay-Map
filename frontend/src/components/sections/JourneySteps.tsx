@@ -1,7 +1,8 @@
 import { useRef, useEffect } from 'react'
-import { gsap, ScrollTrigger } from '@/lib/gsap'
+import { gsap } from '@/lib/gsap'
 import { prefersReducedMotion } from '@/lib/utils'
 import { SplitHeading } from '@/components/motion/SplitHeading'
+import { BOLIVIA_MASK_PATH, MASK_VIEWBOX } from '@/assets/masks/boliviaMask'
 
 const STEPS = [
   {
@@ -58,45 +59,88 @@ const STEPS = [
   },
 ]
 
+// Curva serpenteante que conecta los 4 pasos (escalonados 2x2).
+const JOURNEY_PATH =
+  'M120,90 C360,60 640,150 880,110 C980,95 1010,180 940,235 C860,300 520,250 300,300 C150,335 110,400 250,455 C420,520 760,470 980,520'
+
 /**
- * JourneySteps — patron 5 + patron 12
- * Scroll pineado con las 4 tarjetas apareciendo en cascada.
- * Fondo decorativo de lineas de mapa (patron 12).
- * Titulos en mayuscula con letter-spacing.
+ * JourneySteps — seccion "Como funciona" al estilo Flyward "How We Support".
+ *
+ * Cuatro pasos en grilla 2x2 escalonada (pasos 2 y 4 desplazados hacia abajo),
+ * conectados por una curva dorada dibujada a mano que se traza con el scroll
+ * (stroke-dashoffset + getTotalLength). Los numeros aparecen con rebote
+ * (back.out) y cada tarjeta se revela al entrar al viewport. De fondo, la
+ * silueta de Bolivia a muy baja opacidad funciona como textura.
+ *
+ * prefers-reduced-motion: todo visible, sin trazos ni rebotes.
  */
 export function JourneySteps() {
   const sectionRef = useRef<HTMLElement>(null)
-  const pinnerRef = useRef<HTMLDivElement>(null)
-  const cardsRef = useRef<(HTMLDivElement | null)[]>([])
+  const pathRef = useRef<SVGPathElement>(null)
+  const stepsRef = useRef<(HTMLDivElement | null)[]>([])
 
   useEffect(() => {
     const section = sectionRef.current
-    const pinner = pinnerRef.current
-    const cards = cardsRef.current.filter(Boolean) as HTMLDivElement[]
+    const path = pathRef.current
+    const steps = stepsRef.current.filter(Boolean) as HTMLDivElement[]
+    if (!section) return
 
-    if (!section || !pinner || cards.length === 0) return
-    if (prefersReducedMotion()) {
-      cards.forEach((card) => gsap.set(card, { opacity: 1, y: 0 }))
+    const reduced = prefersReducedMotion()
+
+    if (reduced) {
+      if (path) {
+        const len = path.getTotalLength()
+        gsap.set(path, { strokeDasharray: len, strokeDashoffset: 0 })
+      }
       return
     }
 
-    gsap.set(cards, { opacity: 0, y: 60 })
-
     const ctx = gsap.context(() => {
-      ScrollTrigger.create({
-        trigger: section,
-        start: 'top top',
-        end: `+=${cards.length * 300}`,
-        pin: pinner,
-        onUpdate: (self) => {
-          const progress = self.progress
-          cards.forEach((card, i) => {
-            const threshold = i / cards.length
-            if (progress >= threshold) {
-              gsap.to(card, { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' })
+      // Camino dorado: se dibuja ligado al progreso del scroll.
+      if (path) {
+        const len = path.getTotalLength()
+        gsap.set(path, { strokeDasharray: len, strokeDashoffset: len })
+        gsap.to(path, {
+          strokeDashoffset: 0,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: section,
+            start: 'top 70%',
+            end: 'bottom 60%',
+            scrub: 1.5,
+          },
+        })
+      }
+
+      // Cada paso: reveal + numero con rebote elastico.
+      steps.forEach((step) => {
+        const num = step.querySelector<HTMLElement>('.step-num')
+
+        gsap.fromTo(
+          step,
+          { opacity: 0, y: 40 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            ease: 'power2.out',
+            scrollTrigger: { trigger: step, start: 'top 88%', toggleActions: 'play none none none' },
+          }
+        )
+
+        if (num) {
+          gsap.fromTo(
+            num,
+            { scale: 0, opacity: 0 },
+            {
+              scale: 1,
+              opacity: 1,
+              duration: 0.6,
+              ease: 'back.out(1.8)',
+              scrollTrigger: { trigger: step, start: 'top 85%', toggleActions: 'play none none none' },
             }
-          })
-        },
+          )
+        }
       })
     }, section)
 
@@ -107,53 +151,77 @@ export function JourneySteps() {
     <section
       ref={sectionRef}
       aria-labelledby="steps-heading"
-      className="relative"
+      className="relative overflow-hidden bg-background py-28 px-4 md:px-8"
     >
-      {/* Fondo de lineas de mapa — patron 12 */}
-      <div
+      {/* Fondo: silueta de Bolivia como textura ultra sutil */}
+      <svg
         aria-hidden="true"
-        className="absolute inset-0 bg-background bg-map-lines opacity-60"
-      />
+        className="pointer-events-none absolute left-1/2 top-1/2 h-[120%] w-[120%] -translate-x-1/2 -translate-y-1/2 opacity-[0.05]"
+        viewBox={MASK_VIEWBOX}
+        preserveAspectRatio="xMidYMid meet"
+      >
+        <path d={BOLIVIA_MASK_PATH} fill="#6E4A3F" />
+      </svg>
 
-      <div ref={pinnerRef} className="relative z-10 py-28 px-4 md:px-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-20 text-center">
-            <SplitHeading
-              as="h2"
-              id="steps-heading"
-              className="font-serif text-display-lg font-bold uppercase tracking-[0.04em] text-dark [text-wrap:balance] mb-4"
-            >
-              Como funciona
-            </SplitHeading>
-            <p className="mx-auto max-w-xl text-neutral font-sans">
-              Cuatro pasos para convertir cualquier rincon de Bolivia en una experiencia de aprendizaje.
-            </p>
-          </div>
+      <div className="relative z-10 mx-auto max-w-6xl">
+        <div className="mb-20 text-center">
+          <SplitHeading
+            as="h2"
+            id="steps-heading"
+            className="mb-4 font-serif text-display-lg font-bold uppercase tracking-[0.04em] text-dark [text-wrap:balance]"
+          >
+            Como funciona
+          </SplitHeading>
+          <p className="mx-auto max-w-xl font-sans text-neutral">
+            Cuatro pasos para convertir cualquier rincon de Bolivia en una experiencia de aprendizaje.
+          </p>
+        </div>
 
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Contenedor de la grilla + camino dibujado */}
+        <div className="relative">
+          {/* Camino dorado — solo desktop, detras de las tarjetas */}
+          <svg
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 hidden h-full w-full md:block"
+            viewBox="0 0 1100 600"
+            preserveAspectRatio="none"
+          >
+            <path
+              ref={pathRef}
+              id="journey-path"
+              d={JOURNEY_PATH}
+              fill="none"
+              stroke="#D4A24C"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+            />
+          </svg>
+
+          <div className="grid gap-x-16 gap-y-10 md:grid-cols-2">
             {STEPS.map((step, i) => (
               <div
                 key={step.numero}
-                ref={(el) => { cardsRef.current[i] = el }}
-                className="relative rounded-2xl bg-surface p-8 shadow-[0_2px_16px_rgba(34,28,24,0.08)]"
+                ref={(el) => {
+                  stepsRef.current[i] = el
+                }}
+                className={[
+                  'relative rounded-2xl bg-surface p-8 shadow-[0_2px_16px_rgba(34,28,24,0.08)]',
+                  i % 2 === 1 ? 'md:mt-16' : '',
+                ].join(' ')}
               >
-                {/* Numero decorativo */}
+                {/* Numero con rebote */}
                 <div
+                  className="step-num mb-5 inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary font-serif text-sm font-bold text-surface"
+                  style={{ willChange: 'transform' }}
                   aria-hidden="true"
-                  className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 text-primary font-serif font-bold text-sm"
                 >
                   {step.numero}
                 </div>
 
-                {/* Icono */}
                 <div className="mb-5 text-primary">{step.icono}</div>
 
-                <h3 className="mb-3 font-serif text-lg font-semibold text-dark">
-                  {step.titulo}
-                </h3>
-                <p className="text-sm leading-relaxed text-neutral font-sans">
-                  {step.descripcion}
-                </p>
+                <h3 className="mb-3 font-serif text-lg font-semibold text-dark">{step.titulo}</h3>
+                <p className="font-sans text-sm leading-relaxed text-neutral">{step.descripcion}</p>
               </div>
             ))}
           </div>

@@ -1,0 +1,32 @@
+# nginx config for the Munay Map SPA on Cloud Run.
+# ${PORT} is substituted by the nginx:alpine entrypoint (envsubst) at startup.
+server {
+    listen       ${PORT};
+    server_name  _;
+
+    root   /usr/share/nginx/html;
+    index  index.html;
+
+    # Long-lived cache for fingerprinted assets
+    location /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        try_files $uri =404;
+    }
+
+    # The service worker must never be cached, so PWA updates ship immediately
+    location = /sw.js {
+        add_header Cache-Control "no-cache";
+        try_files $uri =404;
+    }
+
+    # SPA fallback: React Router handles client-side routes
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Lightweight gzip for text assets
+    gzip            on;
+    gzip_types      text/css application/javascript application/json image/svg+xml;
+    gzip_min_length 1024;
+}
