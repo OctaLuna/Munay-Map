@@ -31,9 +31,21 @@ export function Navbar() {
   // 'dark' = texto claro (sobre fotos/secciones oscuras)
   // 'light' = texto oscuro (sobre fondo beige/crema)
   const [navTheme, setNavTheme] = useState<'light' | 'dark'>('light')
+  const [scrollOpacity, setScrollOpacity] = useState(0.08)
   const [mobileOpen, setMobileOpen] = useState(false)
 
   const closeMobile = useCallback(() => setMobileOpen(false), [])
+
+  useEffect(() => {
+    const updateScrollOpacity = () => {
+      const progress = Math.min(window.scrollY / 420, 1)
+      setScrollOpacity(0.08 + progress * 0.64)
+    }
+
+    updateScrollOpacity()
+    window.addEventListener('scroll', updateScrollOpacity, { passive: true })
+    return () => window.removeEventListener('scroll', updateScrollOpacity)
+  }, [])
 
   useEffect(() => {
     // Observar todos los elementos con data-nav-theme en la pagina
@@ -83,7 +95,11 @@ export function Navbar() {
   return (
     <header
       role="banner"
-      className="fixed inset-x-0 top-0 z-[200] transition-colors duration-300"
+      className="fixed inset-x-0 top-0 z-[200] border-b transition-colors duration-300 backdrop-blur-sm"
+      style={{
+        backgroundColor: `rgba(255, 255, 255, ${scrollOpacity})`,
+        borderBottomColor: `rgba(255, 255, 255, ${Math.min(scrollOpacity + 0.12, 0.78)})`,
+      }}
     >
       {/*
        * Gradiente sutil en el top: ayuda a leer el texto sobre fotos brillantes

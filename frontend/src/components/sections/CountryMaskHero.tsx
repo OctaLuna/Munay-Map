@@ -1,20 +1,41 @@
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useGSAP } from '@gsap/react'
 import { gsap, ScrollTrigger } from '@/lib/gsap'
-import { BOLIVIA_SUBTRACT_PATH, MASK_VIEWBOX } from '@/assets/masks/boliviaMask'
+import { BOLIVIA_SUBTRACT_PATH, BOLIVIA_MASK_PATH, MASK_VIEWBOX } from '@/assets/masks/boliviaMask'
+import { BOLIVIA_DEPARTMENTS, DEPT_FIT_TRANSFORM } from '@/assets/masks/boliviaDepartments'
 import { prefersReducedMotion } from '@/lib/utils'
 import { SplitHeading } from '@/components/motion/SplitHeading'
 import { Button } from '@/components/ui/Button'
 import { Link } from 'react-router-dom'
 import { useT } from '@/context/LanguageContext'
+import beniTexture from '@/assets/departments/beni.jpg'
+import cochabambaTexture from '@/assets/departments/cochabamba.jpg'
+import lapazTexture from '@/assets/departments/lapaz.jpg'
+import oruroTexture from '@/assets/departments/oruro.jpg'
+import pandoTexture from '@/assets/departments/pando.jpg'
+import potosiTexture from '@/assets/departments/potosi.jpg'
+import santacruzTexture from '@/assets/departments/santacruz.jpg'
+import sucreTexture from '@/assets/departments/sucre.jpg'
+import tarijaTexture from '@/assets/departments/tarija.jpeg'
 
 interface CountryMaskHeroProps {
   backgroundImageSrc?: string
   maskColor?: string
 }
 
-const DEFAULT_BG =
-  'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=1600&q=80'
+const DEPARTMENT_TEXTURES: Record<string, string> = {
+  BOB: beniTexture,
+  BOC: cochabambaTexture,
+  BOH: sucreTexture,
+  BOL: lapazTexture,
+  BON: pandoTexture,
+  BOO: oruroTexture,
+  BOP: potosiTexture,
+  BOS: santacruzTexture,
+  BOT: tarijaTexture,
+}
+
+const DEFAULT_DEPARTMENT_ID = 'BOL'
 
 /**
  * CountryMaskHero — Efecto Flyward
@@ -32,13 +53,32 @@ const DEFAULT_BG =
  * prefers-reduced-motion: oculta directamente la mascara sin animar.
  */
 export function CountryMaskHero({
-  backgroundImageSrc = DEFAULT_BG,
+  backgroundImageSrc,
   maskColor = '#F4E8D3',
 }: CountryMaskHeroProps) {
   const t = useT()
+  const [activeDepartmentId, setActiveDepartmentId] = useState(DEFAULT_DEPARTMENT_ID)
+  const [isAtHeroTop, setIsAtHeroTop] = useState(true)
   const heroSectionRef = useRef<HTMLElement>(null)
   const maskGroupRef = useRef<SVGGElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
+  const activeTexture =
+    DEPARTMENT_TEXTURES[activeDepartmentId] ??
+    backgroundImageSrc ??
+    DEPARTMENT_TEXTURES[DEFAULT_DEPARTMENT_ID]
+
+  useEffect(() => {
+    const updateTopState = () => setIsAtHeroTop(window.scrollY <= 0)
+
+    updateTopState()
+    window.addEventListener('scroll', updateTopState, { passive: true })
+    return () => window.removeEventListener('scroll', updateTopState)
+  }, [])
+
+  const handleDepartmentEnter = (departmentId: string) => {
+    if (!isAtHeroTop) return
+    setActiveDepartmentId(departmentId)
+  }
 
   useGSAP(
     () => {
@@ -53,14 +93,16 @@ export function CountryMaskHero({
         return
       }
 
-      // Mascara SVG: crece desde el centro geometrico del viewBox (500,500)
-      // y desaparece. scale: 4 hace que la silueta salga por todos los bordes
-      // antes de llegar a opacity 0, sin corte abrupto.
+      // Mascara SVG: crece desde el CENTRO DE LA SILUETA y desaparece. scale: 4
+      // hace que la silueta salga por todos los bordes antes de opacity 0.
+      // El origen se ancla en el centro de la silueta (1019.5, 540) — no en el
+      // centro del viewBox (960, 540) — para que crezca EN EL LUGAR, sin derivar
+      // hacia un costado. (El tamano en reposo se hornea en boliviaMask.ts.)
       gsap.to(maskGroup, {
         scale: 4,
         opacity: 0,
         ease: 'none',
-        transformOrigin: '960px 540px', // coordenadas SVG userspace, no CSS
+        transformOrigin: '1019.5px 540px', // centro de la silueta en coords SVG
         scrollTrigger: {
           trigger: hero,
           start: 'top top',
@@ -105,9 +147,9 @@ export function CountryMaskHero({
         {/* CAPA 1: foto de fondo siempre visible detras de la mascara */}
         <div
           aria-hidden="true"
-          className="absolute inset-0"
+          className="absolute inset-0 transition-[filter] duration-500"
           style={{
-            backgroundImage: `url(${backgroundImageSrc})`,
+            backgroundImage: `url(${activeTexture})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }}
@@ -133,6 +175,19 @@ export function CountryMaskHero({
           xmlns="http://www.w3.org/2000/svg"
           aria-hidden="true"
         >
+          {/*
+           * clipPath con la silueta de Bolivia (mismo path que el hueco de la
+           * mascara). userSpaceOnUse: se evalua en el espacio del <g> que lo
+           * referencia — dentro del maskGroup animado — por lo que la capa de
+           * departamentos se recorta EXACTAMENTE a la silueta visible, incluso
+           * mientras la mascara escala/desvanece. Nada se sale de la forma.
+           */}
+          <defs>
+            <clipPath id="bolivia-clip" clipPathUnits="userSpaceOnUse">
+              <path d={BOLIVIA_MASK_PATH} />
+            </clipPath>
+          </defs>
+
           <g
             ref={maskGroupRef}
             style={{ willChange: 'transform, opacity' }}
@@ -145,31 +200,55 @@ export function CountryMaskHero({
              * por donde se ve la foto de CAPA 1 detras.
              */}
             <path d={BOLIVIA_SUBTRACT_PATH} fill={maskColor} fillRule="evenodd" />
+
+            {/*
+             * Capa interactiva de departamentos (aditiva, no toca la mascara).
+             * - Recortada a la silueta con clip-path → nunca desborda.
+             * - DEPT_FIT_TRANSFORM mapea el espacio 1000x1000 del SVG de origen
+             *   al bbox de la silueta en 1920x1080 → alineacion exacta.
+             * - vector-effect non-scaling-stroke mantiene el grosor del borde
+             *   constante aunque el grupo escale con la animacion del hero.
+             * - El brillo al hover se maneja con CSS (.dept-region:hover).
+             */}
+            <g
+              clipPath="url(#bolivia-clip)"
+              className={isAtHeroTop ? undefined : 'pointer-events-none'}
+            >
+              <g transform={DEPT_FIT_TRANSFORM}>
+                {BOLIVIA_DEPARTMENTS.map((dept) => (
+                  <path
+                    key={dept.id}
+                    d={dept.d}
+                    className={`dept-region ${dept.id === activeDepartmentId ? 'is-active' : ''}`}
+                    vectorEffect="non-scaling-stroke"
+                    onPointerEnter={() => handleDepartmentEnter(dept.id)}
+                  >
+                    <title>{dept.nombre}</title>
+                  </path>
+                ))}
+              </g>
+            </g>
           </g>
         </svg>
 
         {/* CAPA 3: texto centrado sobre la silueta */}
         <div
           ref={contentRef}
-          className="absolute inset-0 z-10 flex flex-col items-center justify-center px-4 text-center"
+          className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center px-4 text-center"
           style={{ willChange: 'opacity, transform' }}
         >
-          <div className="max-w-2xl">
+          <div className="mx-auto flex max-w-[calc(100vw-2rem)] flex-col items-center">
             <SplitHeading
               as="h1"
               id="hero-heading"
-              className="font-serif text-display-xl font-bold leading-tight text-dark [text-wrap:balance] mb-5"
+              className="hero-title-veil mb-5 inline-block max-w-full px-5 py-3 font-serif text-[clamp(2.25rem,4.4vw,4.75rem)] font-bold leading-tight text-dark [text-wrap:balance] sm:px-8 sm:py-4 min-[1280px]:whitespace-nowrap"
               stagger={0.04}
               delay={0.2}
             >
               {t('hero.title')}
             </SplitHeading>
 
-            <p className="mx-auto mb-8 max-w-md text-base text-dark/60 font-sans leading-relaxed">
-              {t('hero.subtitle')}
-            </p>
-
-            <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+            <div className="pointer-events-auto flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
               <Link to="/camara">
                 <Button
                   size="lg"

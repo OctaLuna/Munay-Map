@@ -71,6 +71,52 @@
 }
 
 @layer components {
+  .hero-title-veil {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .hero-title-veil::before {
+    content: "";
+    position: absolute;
+    inset: -0.12em -0.28em;
+    z-index: -1;
+    border-radius: 1rem;
+    background: radial-gradient(
+      ellipse at center,
+      rgba(255, 255, 255, 0.6) 0%,
+      rgba(255, 255, 255, 0.48) 54%,
+      rgba(255, 255, 255, 0.42) 78%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    filter: blur(2px);
+  }
+
+  /* Departamentos del hero — límites visibles + brillo suave al hover.
+     El fill transparente con pointer-events:all hace hoverable toda la región;
+     non-scaling-stroke (en el SVG) mantiene el borde fino al escalar la máscara. */
+  .dept-region {
+    fill: transparent;
+    stroke: rgba(255, 255, 255, 0.4);
+    stroke-width: 1.1;
+    pointer-events: all;
+    cursor: pointer;
+    transition: fill 0.35s ease, stroke 0.35s ease;
+  }
+  .dept-region.is-active {
+    fill: rgba(255, 255, 255, 0.14);
+    stroke: rgba(255, 255, 255, 0.62);
+  }
+  .dept-region:hover {
+    fill: rgba(212, 162, 76, 0.34); /* Dorado Inti translúcido */
+    stroke: rgba(255, 255, 255, 0.85);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .dept-region {
+      transition: none;
+    }
+  }
+
   /* Prose — texto largo legible */
   .prose-bolivia {
     @apply max-w-prose-wide font-sans text-base leading-relaxed text-dark;

@@ -75,8 +75,7 @@ export function LanguageSwitcher() {
         onClick={() => setOpen((v) => !v)}
         className="flex items-center gap-1.5 rounded-lg border border-neutral/20 bg-surface px-3 py-1.5 text-sm font-medium text-dark transition-colors hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
       >
-        <span aria-hidden="true" className="text-base leading-none">{language.bandera}</span>
-        <span className="hidden sm:inline">{language.code.toUpperCase()}</span>
+        <span>{language.code.toUpperCase()}</span>
         <svg
           aria-hidden="true"
           className={`h-3.5 w-3.5 text-neutral transition-transform duration-200 ${open ? 'rotate-180' : ''}`}

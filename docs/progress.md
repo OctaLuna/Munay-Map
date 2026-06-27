@@ -718,6 +718,83 @@ un archivo en `src/i18n/locales/`.
 
 ---
 
+## Cambios del 27/06/2026 — Sesión 7: Mapa departamental interactivo en el hero
+
+**Objetivo:** que la silueta de Bolivia del hero muestre los límites de los 9 departamentos
+y que cada uno brille levemente al hacer hover — sin tocar la animación de recorte ni los estilos.
+
+### Diagnóstico (confirmado con el usuario)
+
+- `docs/image/Subtract (1).svg` (el que usa el hero) es **un único `<path>` unificado**, sin
+  divisiones. No servía para hover por departamento.
+- El usuario aportó `docs/image/bolivia.svg`: viewBox `0 0 1000 1000`, **9 `<path>`** con id ISO
+  y nombres en `label_points` (BOL=La Paz, BOO=Oruro, BOP=Potosí, BOT=Tarija, BOS=Santa Cruz,
+  BOH=Chuquisaca, BON=Pando, BOB=Beni, BOC=Cochabamba).
+
+### Implementación
+
+| Archivo | Cambio |
+|---|---|
+| `src/assets/masks/boliviaDepartments.ts` | **Nuevo** (autogenerado): los 9 paths + `DEPT_FIT_TRANSFORM` que mapea el espacio 1000×1000 al bbox de `BOLIVIA_MASK_PATH` en 1920×1080 |
+| `src/components/sections/CountryMaskHero.tsx` | `<clipPath id="bolivia-clip">` (silueta) + capa `<g>` de departamentos **dentro** del `maskGroup` animado, recortada a la silueta; capa de texto a `pointer-events-none` y botones a `pointer-events-auto` |
+| `src/styles/globals.css` | `.dept-region` (bordes visibles) + `.dept-region:hover` (brillo dorado translúcido), respetando `prefers-reduced-motion` |
+
+**Claves técnicas:**
+- **Alineación exacta:** el `transform` se calculó ajustando el *bounding box* de la unión de los
+  9 departamentos al de la silueta (medidos con `getBBox` en headless). La verificación visual
+  mostró que `bolivia.svg` es el origen real de la silueta → los bordes calzan perfecto.
+- **Sin interferencia:** no se modificó `BOLIVIA_SUBTRACT_PATH`, ni la animación `scale/opacity`,
+  ni la paleta. La capa va **dentro** del `maskGroup`, así escala/desvanece en sincronía con el
+  recorte; `vector-effect="non-scaling-stroke"` mantiene el grosor del borde constante; el
+  `clipPath` (userSpaceOnUse) garantiza que nada se salga de la silueta.
+- **Hover:** puro CSS (`fill` dorado al `:hover` + transición), un solo departamento a la vez.
+
+### Verificación post-sesión 7 (27/06/2026)
+
+- **Typecheck:** `tsc -b` exit 0 · `vite build` limpio · **Vitest 22/22**
+- **Navegador (Playwright, 1440×900):** 9 `.dept-region` presentes; bordes visibles; al hover
+  solo el departamento apuntado toma `fill rgba(212,162,76,0.34)`; al hacer scroll la silueta
+  **sigue escalando/desvaneciéndose** (animación intacta) con los departamentos en sincronía;
+  **sin errores de consola**
+
+
+---
+
+## Cambios del 27/06/2026 — Sesión 8: Reducción del tamaño del mapa del hero
+
+**Objetivo:** el mapa de Bolivia del hero estaba muy grande (tapaba el navbar y desbordaba el
+borde inferior). Reducirlo levemente **sin tocar la animación de recorte ni los estilos**.
+
+### Enfoque (decisión técnica)
+
+Se evaluó escalar el grupo animado con una escala base < 1, pero GSAP calcula `transformOrigin`
+**relativo al bounding box**, y agrandar el rect (para no revelar la foto en los bordes) corría
+el bbox y descentraba la animación. En lugar de pelear con el origen de GSAP, se **horneó la
+reducción en la geometría**, dejando la animación exactamente como estaba.
+
+### Implementación
+
+- `src/assets/masks/boliviaMask.ts` — `BOLIVIA_MASK_PATH` y la silueta de `BOLIVIA_SUBTRACT_PATH`
+  escaladas a **0.86 sobre su propio centro** (bbox nueva: x 574→1465, y 90→990 en 1920×1080 →
+  ~90px de margen arriba y abajo). El **rect se mantiene a 1920×1080** para que el fondo beige
+  cubra el viewport y la animación `scale 1→4` siga centrada en (960,540).
+- `src/assets/masks/boliviaDepartments.ts` — `DEPT_FIT_TRANSFORM` recalculado para ajustar los 9
+  departamentos a la **nueva silueta más chica** (alineación mantenida).
+- `src/components/sections/CountryMaskHero.tsx` — **sin cambios funcionales**: la animación volvió
+  a su forma original (`gsap.to`, `transformOrigin '960px 540px'`). El overlay de departamentos y
+  su hover quedan intactos.
+
+### Verificación post-sesión 8 (27/06/2026)
+
+- **Typecheck:** `tsc -b` exit 0 · `vite build` limpio · **Vitest 22/22**
+- **Navegador (Playwright):** a 1920×1080 y 1366×768 el mapa queda más chico, con **margen sobre
+  el navbar y el borde inferior**; el fondo beige cubre todo (sin foto en los bordes); el `transform`
+  en reposo vuelve a ser identidad `matrix(1,0,0,1,0,0)`; **hover por departamento** sigue
+  funcionando; la **animación de recorte** crece desde el centro igual que antes; **sin errores**
+
+
+---
+
 ## Backend NestJS — Completado el 26 de junio de 2026
 
 ### Tecnologías
