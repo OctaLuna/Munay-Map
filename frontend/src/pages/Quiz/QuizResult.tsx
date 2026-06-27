@@ -21,7 +21,7 @@ export default function QuizResult() {
   }
 
   const { recommendation } = state
-  const { lugares, gastronomia, experiencias, perfilViajero } = recommendation
+  const { lugares, gastronomia, experiencias, perfilViajero, tips } = recommendation
 
   return (
     <main id="main-content" className="min-h-screen bg-background pt-20">
@@ -181,6 +181,54 @@ export default function QuizResult() {
                       </CardBody>
                     </Card>
                   </Link>
+                </RevealOnScroll>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Sección 4 — Tips y consejos personalizados */}
+        {tips && tips.length > 0 && (
+          <section aria-labelledby="tips-heading">
+            <RevealOnScroll>
+              <h2
+                id="tips-heading"
+                className="font-serif text-display-md font-bold text-dark mb-2 [text-wrap:balance]"
+              >
+                Consejos para tu viaje
+              </h2>
+              <p className="mb-8 font-sans text-neutral">
+                Tips prácticos seleccionados especialmente para tu perfil
+              </p>
+            </RevealOnScroll>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {tips.map((tip, i) => (
+                <RevealOnScroll key={tip.titulo} delay={i * 0.07}>
+                  <article className="rounded-2xl border border-gold/25 bg-surface p-6 shadow-sm">
+                    {/* Ícono decorativo */}
+                    <div
+                      aria-hidden="true"
+                      className="mb-3 flex h-9 w-9 items-center justify-center rounded-full bg-gold/15"
+                    >
+                      <svg
+                        className="h-4 w-4 text-gold"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <h3 className="mb-2 font-serif text-base font-semibold text-dark">
+                      {tip.titulo}
+                    </h3>
+                    <p className="font-sans text-sm leading-relaxed text-neutral">
+                      {tip.descripcion}
+                    </p>
+                  </article>
                 </RevealOnScroll>
               ))}
             </div>

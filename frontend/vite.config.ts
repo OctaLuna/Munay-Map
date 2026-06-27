@@ -14,8 +14,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
-        name: 'Guía Turística Bolivia IA',
-        short_name: 'Bolivia IA',
+        name: 'Munay Map',
+        short_name: 'Munay Map',
         description:
           'Explora la cultura boliviana con IA: reconocimiento de sitios, explicaciones multiidioma y recomendaciones personalizadas.',
         theme_color: '#3B5D43',

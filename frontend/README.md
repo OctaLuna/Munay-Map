@@ -1,4 +1,4 @@
-# BoliviaIA — Guía Turística Multiidioma con IA
+# Munay Map — Guía Turística Multiidioma con IA
 
 Frontend production-grade para una app de turismo cultural boliviano con reconocimiento de imágenes, explicaciones generadas por IA en 40+ idiomas y recomendaciones de viaje personalizadas.
 

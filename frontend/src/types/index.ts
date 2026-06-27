@@ -137,11 +137,17 @@ export interface QuizRecommendationPayload {
   idioma: string
 }
 
+export interface QuizTip {
+  titulo: string
+  descripcion: string
+}
+
 export interface QuizRecommendation {
   lugares: Site[]       // sitios turísticos que coinciden con el perfil
   gastronomia: Site[]   // experiencias gastronómicas recomendadas
   experiencias: Site[]  // danzas, festividades y tradiciones recomendadas
   perfilViajero: string // descripción textual del perfil detectado
+  tips: QuizTip[]       // consejos prácticos personalizados según el perfil
 }
 
 // ---------------------------------------------------------------------------

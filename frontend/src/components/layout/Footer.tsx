@@ -34,7 +34,7 @@ export function Footer() {
                 <circle cx="20" cy="20" r="3" fill="#D4A24C" />
               </svg>
               <span className="font-serif text-lg font-semibold text-surface">
-                Bolivia<span className="text-primary">IA</span>
+                Munay <span className="text-primary">Map</span>
               </span>
             </div>
             <p className="text-sm leading-relaxed text-surface/60">
@@ -84,7 +84,7 @@ export function Footer() {
 
         <div className="mt-10 border-t border-surface/10 pt-6 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
           <p className="text-xs text-surface/40">
-            © {new Date().getFullYear()} BoliviaIA · {/* [PENDIENTE] Nombre legal definitivo */}
+            © {new Date().getFullYear()} Munay Map · {/* [PENDIENTE] Nombre legal definitivo */}
             Proyecto académico
           </p>
           <p className="text-xs text-surface/30">

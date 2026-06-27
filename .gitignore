@@ -1,5 +1,5 @@
 # ============================================================
-# BoliviaIA — .gitignore
+# Munay Map — .gitignore
 # Cubre: Frontend (Vite + React + TS) + Backend (NestJS + Node)
 # ============================================================
 
@@ -181,3 +181,7 @@ storybook-static/
 
 # Sentry
 .sentryclirc
+
+
+# O específicamente el nombre del archivo:
+docs/munay-map-8421e94db8b8.json

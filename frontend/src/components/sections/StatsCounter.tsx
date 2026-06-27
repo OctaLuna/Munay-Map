@@ -8,12 +8,17 @@ const STATS = [
   { target: 200, suffix: '+', label: 'Sitios catalogados', prefix: '' },
   { target: 9, suffix: '', label: 'Departamentos', prefix: '' },
   { target: 40, suffix: '+', label: 'Idiomas disponibles', prefix: '' },
-  { target: 2000, suffix: '+', label: 'Años de historia', prefix: '' },
+  { target: 2000, suffix: '+', label: 'Anos de historia', prefix: '' },
 ]
 
+// Foto del altiplano boliviano — Salar de Uyuni al atardecer
+const BG_IMAGE =
+  'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=1600&q=80'
+
 /**
- * StatsCounter — patrón 6
- * Contadores animados que se disparan al entrar en viewport.
+ * StatsCounter — patron 6
+ * Contadores animados sobre foto de fondo real (altiplano).
+ * Overlay oscuro para legibilidad del texto en blanco.
  */
 export function StatsCounter() {
   const lineRef = useRef<HTMLDivElement>(null)
@@ -38,25 +43,37 @@ export function StatsCounter() {
   return (
     <section
       aria-labelledby="stats-heading"
-      className="bg-primary py-20 px-4 md:px-8"
+      className="relative py-24 px-4 md:px-8"
+      style={{
+        backgroundImage: `url(${BG_IMAGE})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center 40%',
+        backgroundAttachment: 'fixed',
+      }}
     >
-      <div className="mx-auto max-w-7xl">
+      {/* Overlay oscuro para contraste — los numeros en blanco/dorado sobre foto */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-dark/65"
+      />
+
+      <div className="relative z-10 mx-auto max-w-7xl">
         <RevealOnScroll>
           <h2 id="stats-heading" className="sr-only">
-            Estadísticas del proyecto
+            Estadisticas del proyecto
           </h2>
         </RevealOnScroll>
 
         <div
           ref={lineRef}
           aria-hidden="true"
-          className="mb-12 h-px w-full bg-surface/20"
+          className="mb-14 h-px w-full bg-surface/20"
         />
 
-        <dl className="grid grid-cols-2 gap-8 lg:grid-cols-4">
+        <dl className="grid grid-cols-2 gap-10 lg:grid-cols-4">
           {STATS.map((stat) => (
             <div key={stat.label} className="text-center">
-              <dt className="order-2 mt-2 text-sm font-medium text-surface/70 font-sans">
+              <dt className="order-2 mt-2 text-sm font-medium text-surface/60 font-sans uppercase tracking-[0.08em]">
                 {stat.label}
               </dt>
               <dd className="order-1 font-serif text-display-lg font-bold text-gold">

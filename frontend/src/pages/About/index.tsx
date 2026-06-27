@@ -74,7 +74,7 @@ const ABOUT_CARDS = [
     id: 'por-que',
     titulo: '¿Por qué este proyecto?',
     contenido:
-      'Bolivia tiene uno de los patrimonios culturales más ricos de Sudamérica, pero enfrenta un déficit severo de guías multiidioma. BoliviaIA no reemplaza a los guías humanos — los amplifica, llega donde ellos no pueden.',
+      'Bolivia tiene uno de los patrimonios culturales más ricos de Sudamérica, pero enfrenta un déficit severo de guías multiidioma. Munay Map no reemplaza a los guías humanos — los amplifica, llega donde ellos no pueden.',
     dark: true,
   },
   {
@@ -102,7 +102,7 @@ export default function AboutPage() {
               id="about-heading"
               className="font-serif text-display-lg font-bold text-surface [text-wrap:balance] mb-6"
             >
-              Sobre BoliviaIA
+              Sobre Munay Map
             </SplitHeading>
           </RevealOnScroll>
           <RevealOnScroll delay={0.1}>

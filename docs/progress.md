@@ -1,7 +1,8 @@
-# BoliviaIA — Progreso del Proyecto
+# Munay Map — Progreso del Proyecto
 
-> Última actualización: 26 de junio de 2026
-> Estado general: **Frontend completo · Backend pendiente**
+> Última actualización: 26 de junio de 2026 (sesión 2 — rediseño visual + fix hero)
+> Estado general: **Frontend completo · Backend NestJS completo · Deploy pendiente**
+> Nombre del proyecto: **Munay Map** (renombrado desde BoliviaIA el 26/06/2026)
 
 ---
 
@@ -12,7 +13,7 @@
 ### Arquitectura de alto nivel
 
 ```
-[Turista] → [Frontend React/Vite] → [Backend NestJS (pendiente)]
+[Turista] → [Frontend React/Vite] → [Backend NestJS]
                                           ↓
                                    [Google Vision AI]
                                    [Google Gemini]
@@ -27,15 +28,18 @@
 | Capa | Estado | Notas |
 |---|---|---|
 | **Frontend** | ✅ Completo | Todos los componentes, páginas y animaciones |
-| **Backend NestJS** | 🔲 Pendiente | Estructura de endpoints definida, lista para implementar |
+| **Backend NestJS** | ✅ Completo | 7 endpoints, 35 tests Playwright, mock/real toggle |
 | **Base de datos** | 🔲 Pendiente | Esquema implícito en los tipos TypeScript |
-| **IA (Vision AI + Gemini)** | 🔲 Pendiente | Integración mock lista para swap |
-| **TTS (Text-to-Speech)** | 🔲 Pendiente | audioUrl reservada en RecognizeResponse |
+| **IA (Vision AI + Gemini)** | ✅ Completo | Implementación real + mock, intercambiables por GOOGLE_CLOUD_MOCK_MODE |
+| **TTS (Text-to-Speech)** | ✅ Completo | Implementación real + mock, devuelve MP3 en base64 |
 | **Deploy (Cloud Run)** | 🔲 Pendiente | vite-plugin-pwa configurado para producción |
 
 ---
 
 ## Frontend — Completado el 26 de junio de 2026
+
+> **Actualización 26/06/2026 (sesión 1):** Renombrado a Munay Map + efecto de scroll con silueta real de Bolivia implementado.
+> **Actualización 26/06/2026 (sesión 2):** Rediseño visual del Home, Navbar y secciones + fix definitivo del efecto de silueta con SVG 16:9.
 
 ### Tecnologías
 
@@ -102,8 +106,8 @@ src/
 │   │   ├── ProgressBar.tsx             ← Con animación y aria-valuenow
 │   │   ├── Accordion.tsx               ← GSAP height animate (patrón 7)
 │   │   └── Marquee.tsx                 ← GSAP xPercent infinito (patrón 8)
-│   ├── sections/
-│   │   ├── CountryMaskHero.tsx         ← Hero con silueta SVG de Bolivia (patrones 1+2)
+   │   ├── sections/
+│   │   ├── CountryMaskHero.tsx         ← Hero sticky+scrub con silueta real de Bolivia
 │   │   ├── JourneySteps.tsx            ← Scroll pineado 4 pasos (patrón 5)
 │   │   ├── StatsCounter.tsx            ← Contadores animados (patrón 6)
 │   │   ├── TwoColumnsRagged.tsx        ← Borde irregular SVG (patrón 4)
@@ -146,7 +150,7 @@ src/
 │   ├── gsap.ts                         ← Registro de plugins GSAP
 │   ├── featureFlags.ts                 ← USE_MOCK_DATA (único punto de switch)
 │   └── utils.ts                        ← cn(), mockDelay(), normalizeForSearch(), etc.
-├── assets/masks/boliviaMask.ts         ← Path SVG placeholder de Bolivia
+├── assets/masks/boliviaMask.ts         ← Path SVG real de Bolivia (extraído de docs/image/Subtract.svg)
 ├── styles/
 │   ├── globals.css                     ← Tailwind base + skip-link + reduced-motion
 │   └── fonts.css                       ← Google Fonts (Fraunces + Inter)
@@ -204,8 +208,8 @@ src/
 
 | # | Patrón | Implementación | Componente |
 |---|---|---|---|
-| 1 | Parallax 2 capas de imagen | `gsap.to(layer, { yPercent, scrub })` | `CountryMaskHero` |
-| 2 | Clip-path silueta de país | `stroke-dasharray` draw + reveal | `CountryMaskHero` |
+| 1 | Scroll sticky + scrub silueta de país | `useGSAP` + `scale: 3, opacity: 0, scrub: true` | `CountryMaskHero` |
+| 2 | Fade del contenido del hero en scroll | `gsap.to(contentRef, { opacity: 0, scrub: true })` | `CountryMaskHero` |
 | 3 | Reveal titular palabra por palabra | Split manual + stagger `y: 110%→0` | `SplitHeading` |
 | 4 | Borde irregular "papel rasgado" | SVG `<path>` + `gsap.from(attr.d)` | `TwoColumnsRagged` |
 | 5 | Scroll pineado tarjetas cascada | `ScrollTrigger({ pin: true })` + stagger | `JourneySteps` |
@@ -249,13 +253,16 @@ src/
 
 ```
 dist/index.html                       1.18 kB │ gzip:   0.59 kB
-dist/assets/index-Dh7X5oIW.js       466.01 kB │ gzip: 150.96 kB
-dist/assets/index-BAip8wdX.css        27.59 kB │ gzip:   6.28 kB
+dist/assets/index-Ct4P1lTk.js       517.41 kB │ gzip: 175.12 kB
+dist/assets/index-C-e1V8za.css       27.24 kB │ gzip:   6.29 kB
 dist/sw.js                            (PWA Service Worker)
 dist/workbox-*.js                     (Workbox runtime)
 ```
 
-107 módulos transformados. Build limpio sin warnings de TypeScript.
+108 módulos transformados. Build limpio sin errores de TypeScript.
+
+> Nota: el chunk principal creció ~51KB respecto al build anterior debido al path SVG real
+> de Bolivia (~51KB sin comprimir, ~12KB gzip). Es comportamiento esperado y aceptable.
 
 ---
 
@@ -315,13 +322,14 @@ Los siguientes elementos están marcados con `// [PENDIENTE]` en el código fuen
 | `src/pages/Home/index.tsx` | Texto definitivo de "qué resolvemos" |
 | `src/components/layout/Footer.tsx` | Información legal (términos, privacidad, contacto, nombre legal) |
 | `src/components/sections/TestimonialSlider.tsx` | Testimoniales reales de usuarios |
-| `src/assets/masks/boliviaMask.ts` | SVG real del contorno de Bolivia |
 | `src/pages/Capture/Result.tsx` | Mapa interactivo con coordenadas |
 | `src/pages/Library/SiteDetail.tsx` | Mapa interactivo con coordenadas |
 | `src/services/api/*.ts` | Implementación completa cuando backend esté listo |
 | `public/pwa-192x192.png` | Ícono real de la app para PWA |
 | `public/pwa-512x512.png` | Ícono real de la app para PWA |
 | `src/pages/About/index.tsx` FAQ | Modelo de negocio / pricing definitivo |
+
+> `src/assets/masks/boliviaMask.ts` — **resuelto el 26/06/2026**: ya contiene el path SVG real extraído de `docs/image/Subtract.svg`.
 
 ---
 
@@ -335,3 +343,239 @@ Los siguientes elementos están marcados con `// [PENDIENTE]` en el código fuen
 | Servicios en dos carpetas (`mock/` y `api/`) con firmas idénticas | Un solo archivo con condicional | Permite cambiar de implementación en tiempo de build, no en runtime |
 | TanStack Query v5 con `queryOptions` helper | Queries inline en componentes | Type-safety completa, reutilización de query configs, prefetching simplificado |
 | Tailwind v3 (no v4) | Tailwind v4 | v4 no tiene CLI independiente ni `init -p`; v3 es estable y compatible con el ecosistema actual |
+| Hero con `h-[200vh]` sticky + scrub | Animación one-shot al cargar | El scrub liga la animación al scroll en ambas direcciones sin lógica de reversa |
+| `clipPathUnits="userSpaceOnUse"` en el clipPath de Bolivia | `objectBoundingBox` | El path real usa coordenadas absolutas (1000×1000); userSpaceOnUse evita normalización manual |
+| `useGSAP` de `@gsap/react` en CountryMaskHero | `useEffect` manual con `gsap.context` | Limpieza automática de ScrollTriggers, mejor integración con React 19 StrictMode |
+
+---
+
+## Cambios del 26/06/2026
+
+### 1. Renombrado a Munay Map
+
+El proyecto fue renombrado de **BoliviaIA** a **Munay Map**. Archivos actualizados:
+
+| Archivo | Cambio |
+|---|---|
+| `frontend/index.html` | `<title>` y `og:title` |
+| `frontend/README.md` | Título h1 |
+| `frontend/vite.config.ts` | `name` y `short_name` del PWA manifest |
+| `frontend/src/components/layout/Navbar.tsx` | Logo text + `aria-label` |
+| `frontend/src/components/layout/Footer.tsx` | Logo text + copyright |
+| `frontend/src/pages/Home/index.tsx` | Texto del body |
+| `frontend/src/pages/About/index.tsx` | Subtítulo h1 + cuerpo de texto |
+| `docs/progress.md` | Título h1 |
+| `.gitignore` | Comentario de cabecera |
+
+Verificado con `grep` — 0 ocurrencias de "BoliviaIA" en el repositorio.
+
+### 2. Efecto de scroll del hero — arquitectura final
+
+#### `src/assets/masks/boliviaMask.ts`
+
+Actualizado dos veces durante la sesión — estado final:
+
+- `MASK_VIEWBOX`: `'0 0 1000 700'` → `'0 0 1000 1000'` → **`'0 0 1920 1080'`** (SVG 16:9 final)
+- `BOLIVIA_SUBTRACT_PATH`: compound path = rectángulo `1920×1080` + silueta de Bolivia (usar con `fillRule="evenodd"` para crear el agujero)
+- `BOLIVIA_MASK_PATH`: solo la silueta, sin el rectángulo exterior
+- **Fuente:** `docs/image/Subtract (1).svg` — viewBox `0 0 1920 1080`, proporción 16:9
+
+> El SVG original `Subtract.svg` era cuadrado `1000×1000`. En pantallas rectangulares (16:9) la máscara nunca cubría el viewport completo, dejando ver la foto directamente por las franjas no cubiertas.
+
+#### `src/components/sections/CountryMaskHero.tsx`
+
+Arquitectura final del componente:
+
+```
+<section ref={heroSectionRef} h-[200vh] bg-background>
+  <div sticky top-0 h-screen bg-background>          ← fondo beige continuo
+    <div imagen-de-fondo />                           ← foto siempre visible detrás
+    <svg viewBox="0 0 1920 1080"
+         preserveAspectRatio="xMidYMid slice">        ← cubre todo el viewport
+      <g ref={maskGroupRef}>                          ← ANIMADO por GSAP: scale + opacity
+        <path BOLIVIA_SUBTRACT_PATH
+              fill="#F4E8D3"
+              fillRule="evenodd" />                   ← fillRule="evenodd" crea el hueco Bolivia
+      </g>
+    </svg>
+    <div ref={contentRef}>                            ← texto, desaparece en 35% del scroll
+  </div>
+</section>
+```
+
+**Animación GSAP (sobre el `<g>` SVG, no sobre un `<div>`):**
+```typescript
+gsap.to(maskGroupRef, {
+  scale: 4, opacity: 0, ease: 'none',
+  transformOrigin: '960px 540px',   // centro del viewBox 1920x1080 en coordenadas SVG
+  scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true }
+})
+gsap.to(contentRef, {
+  opacity: 0, y: -24, ease: 'none',
+  scrollTrigger: { trigger: hero, start: 'top top', end: '35% top', scrub: true }
+})
+```
+
+**Comportamiento:**
+- Estado inicial: fondo beige con silueta de Bolivia centrada, foto visible a través del hueco
+- Scroll hacia abajo: silueta crece (scale 1→4) y desaparece, revelando la foto completa
+- Scroll hacia arriba: efecto se revierte en sincronía exacta con el scroll (`scrub: true`)
+- `prefers-reduced-motion`: máscara oculta directamente (opacity 0) sin animar
+
+**Tres bugs resueltos (sesión 2):**
+
+| Bug | Causa | Fix |
+|---|---|---|
+| SVG no cubre el viewport | `Subtract.svg` era `1000×1000` cuadrado | Nuevo `Subtract (1).svg` `1920×1080` 16:9 |
+| Franjas transparentes laterales | `preserveAspectRatio="meet"` escala sin cubrir | Cambiado a `"slice"` |
+| Máscara se renderiza sólido sin hueco | Faltaba `fillRule="evenodd"` en `<path>` | Agregado `fillRule="evenodd"` |
+
+### 3. Verificación post-sesión 1 (26/06/2026)
+
+- **Build:** 108 módulos transformados, 0 errores TypeScript
+- **Tests:** 15/15 pasando sin cambios
+
+
+---
+
+## Cambios del 26/06/2026 — Sesión 2: Rediseño visual + fix hero
+
+### 1. Rediseño visual del Home — Navbar, secciones y tipografía
+
+**Objetivo:** alinear el estilo con la referencia visual de Flyward — navbar transparente, tipografía editorial, secciones con mayor impacto visual.
+
+#### `Navbar.tsx` — rediseño completo
+
+| Aspecto | Antes | Después |
+|---|---|---|
+| Fondo | Transparente → `bg-surface/95` al scroll | Siempre transparente |
+| Links | `text-sm font-medium` | MAYÚSCULA + `tracking-[0.1em]` + `text-[13px]` |
+| Logo | SVG circular verde + "Munay `text-primary` Map" | Solo `font-serif uppercase tracking-[0.12em]`, color único |
+| Botón CTA | `rounded-lg` | `rounded-full` (píldora) + uppercase + tracking |
+| Tema de texto | Siempre oscuro | Adaptativo: `IntersectionObserver` sobre `data-nav-theme="light|dark"` |
+
+Mecanismo del tema adaptativo: cada sección del Home tiene un `data-nav-theme="light"` o `"dark"` según su fondo.
+El Navbar observa qué sección ocupa el top del viewport y cambia el color del texto (`text-dark` vs `text-surface`) con transición de 300ms.
+
+#### `JourneySteps.tsx`
+
+- Título `h2`: uppercase + `tracking-[0.04em]` + `text-display-lg`
+- Padding de tarjetas: `p-6` → `p-8`, `rounded-xl` → `rounded-2xl`, `gap-6` → `gap-8`
+
+#### `TwoColumnsRagged.tsx` — rediseño completo
+
+Antes: texto + imagen pequeña side-by-side. Después: dos columnas full-bleed `h-[70vh]` con fotos de fondo reales:
+
+- Columna izquierda: foto de Tiwanaku (Lugares para explorar)
+- Columna derecha: foto de la Diablada (Sabores para descubrir)
+- Overlay gradiente `from-dark/80 via-dark/30` para legibilidad
+- Títulos `h3` en uppercase blanco superpuestos sobre las fotos
+- Botones Explorar en píldora `rounded-full` en cada columna
+- Divisor SVG rasgado animado con `ScrollTrigger` al entrar en viewport
+
+#### `StatsCounter.tsx`
+
+- Antes: fondo `bg-primary` (verde sólido)
+- Después: foto de altiplano (Salar de Uyuni) con `background-attachment: fixed` + overlay `bg-dark/65`
+- Labels con `uppercase tracking-[0.08em]`
+
+#### `EditorialText.tsx` — componente nuevo
+
+Nueva sección entre `StatsCounter` y `TestimonialSlider`:
+
+- Fondo `bg-surface` (crema) con `bg-map-lines opacity-30`
+- Grilla de 12 columnas asimétrica: título H2 uppercase (4 cols) + párrafos desplazados (8 cols)
+- Cita editorial con borde dorado izquierdo (`border-l-2 border-gold`)
+- `RevealOnScroll` con delays escalonados por elemento
+
+#### `Home/index.tsx`
+
+- Integra `EditorialText` entre `StatsCounter` y `TestimonialSlider`
+- Cada sección envuelta en `<div data-nav-theme="light|dark">` para el navbar adaptativo
+- Títulos `h2`: `uppercase tracking-[0.04em] text-display-lg`
+
+### 2. Fix definitivo del efecto de silueta de Bolivia
+
+Documentado en la sección `### 2. Efecto de scroll del hero — arquitectura final` arriba.
+
+### 3. Verificación post-sesión 2 (26/06/2026)
+
+- **Build:** 109 módulos transformados (108 + `EditorialText`), 0 errores TypeScript
+- **Tests:** 15/15 pasando sin cambios
+- **Archivo nuevo:** `docs/image/Subtract (1).svg` — SVG `1920×1080` 16:9 agregado a la carpeta de assets de documentación
+
+
+---
+
+## Backend NestJS — Completado el 26 de junio de 2026
+
+### Tecnologías
+
+| Tecnología | Versión | Uso |
+|---|---|---|
+| NestJS | 11.0.1 | Framework backend |
+| TypeScript | 5.7.3 (strict) | Tipado |
+| @nestjs/config | 4.0.4 | Variables de entorno |
+| @nestjs/swagger | 11.4.4 | Documentación OpenAPI en /api/docs |
+| @nestjs/throttler | 6.5.0 | Rate limiting (60 req/min) |
+| class-validator | 0.15.1 | Validación de DTOs |
+| @google-cloud/vision | 5.3.7 | Vision AI |
+| @google/genai | 2.10.0 | Gemini 2.5 Flash |
+| @google-cloud/text-to-speech | 6.4.1 | TTS — MP3 en base64 |
+| Playwright | 1.61.1 | Tests de API (sin browser) |
+
+### Endpoints implementados
+
+| Método | Endpoint | Módulo | Tests |
+|---|---|---|---|
+| `GET` | `/health` | `HealthModule` | 2 |
+| `GET` | `/catalog/sites` | `CatalogModule` | 5 |
+| `GET` | `/catalog/sites/:id` | `CatalogModule` | 3 |
+| `POST` | `/recognize` | `RecognizeModule` | 7 |
+| `POST` | `/chat/ask` | `ChatModule` | 7 |
+| `GET` | `/quiz/questions` | `QuizModule` | 3 |
+| `POST` | `/quiz/recommendation` | `QuizModule` | 6 |
+
+**Total: 35/35 tests Playwright pasando**
+
+### Catálogo de datos (`data/sites.json`)
+
+13 sitios culturales bolivianos:
+
+| ID | Nombre | Tipo | Departamento |
+|---|---|---|---|
+| `tiwanaku` | Tiwanaku | sitio_turistico | La Paz |
+| `salar-uyuni` | Salar de Uyuni | sitio_turistico | Potosí |
+| `lago-titicaca` | Lago Titicaca e Isla del Sol | sitio_turistico | La Paz |
+| `potosi-cerro-rico` | Potosí y el Cerro Rico | sitio_turistico | Potosí |
+| `sucre-ciudad-blanca` | Sucre, la Ciudad Blanca | sitio_turistico | Chuquisaca |
+| `parque-madidi` | Parque Nacional Madidi | sitio_turistico | La Paz |
+| `samaipata` | El Fuerte de Samaipata | sitio_turistico | Santa Cruz |
+| `chuño` | Chuño y la papa deshidratada andina | gastronomia | La Paz |
+| `morenada` | Morenada | danza | Oruro |
+| `diablada` | Diablada | danza | Oruro |
+| `alasitas` | Feria de Alasitas | tradicion_festividad | La Paz |
+| `carnaval-oruro` | Carnaval de Oruro | tradicion_festividad | Oruro |
+| `salteña` | Salteña | gastronomia | Chuquisaca |
+
+### Patrón mock/real
+
+Cada servicio externo tiene:
+- `*.service.interface.ts` — Port TypeScript puro
+- `*.service.ts` — Implementación real (usa SDK)
+- `*.service.mock.ts` — Mock (datos hardcodeados, sin red)
+- `*.module.ts` — Selección por `GOOGLE_CLOUD_MOCK_MODE` env var
+
+### Skills creadas
+
+| Skill | Documenta |
+|---|---|
+| `add-google-cloud-module` | Cómo agregar un módulo de integración Google Cloud con patrón mock/real |
+| `playwright-api-test` | Cómo escribir tests de API con Playwright para este backend |
+| `mock-real-toggle` | Cómo cambiar entre modo mock y modo real, credenciales, troubleshooting |
+
+### Próximo paso: Conexión frontend ↔ backend
+
+1. En `frontend/.env.local`: `VITE_API_BASE_URL=http://localhost:3000/api`
+2. En `frontend/src/lib/featureFlags.ts`: `USE_MOCK_DATA = false`
+3. Las firmas en `frontend/src/services/api/` ya coinciden con los endpoints — implementación mínima.
