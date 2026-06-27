@@ -142,12 +142,43 @@ export interface QuizTip {
   descripcion: string
 }
 
+/** Presupuesto estimado derivado de la respuesta de presupuesto del quiz */
+export interface QuizPresupuesto {
+  nivel: string // 'Económico' | 'Moderado' | 'Cómodo' | 'Premium'
+  rangoDiarioUsd: string
+  descripcion: string
+}
+
+/**
+ * Un día del itinerario personalizado. Estructura plana (no anida Site completo)
+ * para mantener el payload liviano y desacoplado del catálogo.
+ */
+export interface ItinerarioDia {
+  dia: number
+  titulo: string // tema del día, según el interés dominante del viajero
+  region: string // departamento donde transcurre el día
+  siteId: string // sitio principal — enlaza con /biblioteca/:siteId
+  nombreSitio: string
+  imagenUrl: string
+  descripcion: string // qué hacer ese día
+  comida?: string // qué probar (gastronomía recomendada en la región)
+  experiencia?: string // qué vivir (danza/festividad recomendada)
+  consejo?: string // micro-consejo práctico del día
+}
+
 export interface QuizRecommendation {
   lugares: Site[]       // sitios turísticos que coinciden con el perfil
   gastronomia: Site[]   // experiencias gastronómicas recomendadas
   experiencias: Site[]  // danzas, festividades y tradiciones recomendadas
   perfilViajero: string // descripción textual del perfil detectado
   tips: QuizTip[]       // consejos prácticos personalizados según el perfil
+  // ─── Guía personalizada completa (campos opcionales, aditivos) ───────────
+  resumenPerfil?: string         // narrativa breve del perfil de viajero
+  intereses?: string[]           // etiquetas de interés dominantes (chips)
+  duracionSugeridaDias?: number  // duración recomendada del viaje
+  mejorEpoca?: string            // mejor época para viajar según las respuestas
+  presupuesto?: QuizPresupuesto  // nivel y rango de presupuesto estimado
+  itinerario?: ItinerarioDia[]   // itinerario optimizado día por día
 }
 
 // ---------------------------------------------------------------------------

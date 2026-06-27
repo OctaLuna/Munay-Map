@@ -602,6 +602,63 @@ Presentes y cableados en `app.module.ts`: `HealthModule`, `CatalogModule`, `Visi
 
 ---
 
+## Cambios del 27/06/2026 — Sesión 5: Guía turística personalizada (quiz → itinerario)
+
+**Objetivo:** convertir el quiz existente (perfil + recomendaciones por categoría) en una
+**guía de turismo completa y optimizada**: un itinerario día por día adaptado a los gustos
+del viajero, además de duración, mejor época y presupuesto sugeridos.
+
+### Enfoque
+
+El quiz ya existía (9 preguntas en `/quiz`, ruta "Tu Guía Personalizada"). En vez de duplicarlo,
+se **extendió** el contrato `QuizRecommendation` con campos **aditivos** (no rompe los tests de
+contrato existentes) y se redibujó la pantalla de resultado.
+
+### Campos nuevos en `QuizRecommendation` (frontend `types/index.ts` + backend)
+
+| Campo | Qué aporta |
+|---|---|
+| `itinerario: ItinerarioDia[]` | Recorrido día por día, **ordenado por región** para minimizar traslados |
+| `duracionSugeridaDias` | Igual al nº de días del itinerario |
+| `mejorEpoca` | Derivada de la respuesta de temporada (q9), con respaldo por intereses |
+| `presupuesto` | Nivel + rango USD/día, derivado de la respuesta de presupuesto (q6) |
+| `resumenPerfil` | Narrativa breve del perfil |
+| `intereses` | Etiquetas dominantes (chips) |
+
+Cada `ItinerarioDia` enlaza un sitio (`siteId` → `/biblioteca/:id`), un tema, y filas
+**Para comer / Para vivir / Consejo** (gastronomía + danza/festividad + micro-tip por región).
+
+### Archivos
+
+| Archivo | Cambio |
+|---|---|
+| `backend/src/quiz/quiz.service.ts` | **Ruta activa** (`USE_MOCK_DATA=false`): builder de itinerario, presupuesto, época, resumen |
+| `frontend/src/services/mock/quiz.ts` | Mismo builder (paridad de contrato y tests sin backend) |
+| `frontend/src/types/index.ts` | Tipos `ItinerarioDia`, `QuizPresupuesto` + extensión de `QuizRecommendation` |
+| `frontend/src/pages/Quiz/QuizResult.tsx` | Rediseño: hero de perfil + chips, banda resumen (duración/época/presupuesto), **timeline de itinerario**, botón Imprimir/Guardar, secciones por categoría + tips |
+| `frontend/src/test/quizGuide.test.ts` | **Nuevo** — 6 tests (itinerario, orden geográfico, presupuesto q6, época q9, intereses, compatibilidad) |
+| `backend/src/quiz/quiz.service.spec.ts` | +2 tests (itinerario numerado, presupuesto/época/intereses) |
+
+### Verificación post-sesión 5 (27/06/2026)
+
+- **Frontend:** `tsc -b` exit 0 · **Vitest 22/22** (16 previos + 6 nuevos)
+- **Backend:** `nest build` exit 0 · **Jest 29/29** (27 previos + 2 nuevos)
+- **End-to-end:** frontend + backend NestJS real (mock mode) levantados; quiz completado en
+  navegador (Playwright) → `/quiz/resultado` renderiza la guía con itinerario de 3 días
+  ordenado por región, presupuesto y época derivados, **sin errores de consola**
+
+### Hallazgo pendiente (preexistente, fuera del alcance de esta función)
+
+El cliente del frontend usa base `http://localhost:3000/api`, pero el backend **no define
+`setGlobalPrefix('api')`** (sus rutas son `/quiz/...`, `/health`, etc.). Con `USE_MOCK_DATA=false`
+y la base por defecto, las llamadas darían 404. Para la verificación se apuntó el frontend a
+`VITE_API_BASE_URL=http://localhost:3001` (sin `/api`) y funcionó. **Recomendación:** agregar
+`app.setGlobalPrefix('api')` en `backend/src/main.ts` **o** ajustar la base del cliente. No se
+modificó aquí por estar fuera del alcance de esta función y poder afectar tests/deploy.
+
+
+---
+
 ## Backend NestJS — Completado el 26 de junio de 2026
 
 ### Tecnologías

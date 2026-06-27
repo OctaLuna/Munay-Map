@@ -21,7 +21,21 @@ export default function QuizResult() {
   }
 
   const { recommendation } = state
-  const { lugares, gastronomia, experiencias, perfilViajero, tips } = recommendation
+  const {
+    lugares,
+    gastronomia,
+    experiencias,
+    perfilViajero,
+    tips,
+    resumenPerfil,
+    intereses,
+    duracionSugeridaDias,
+    mejorEpoca,
+    presupuesto,
+    itinerario,
+  } = recommendation
+
+  const hasItinerario = Array.isArray(itinerario) && itinerario.length > 0
 
   return (
     <main id="main-content" className="min-h-screen bg-background pt-20">
@@ -32,7 +46,7 @@ export default function QuizResult() {
       >
         <RevealOnScroll>
           <p className="mb-2 font-sans text-sm font-medium uppercase tracking-wider text-surface/60">
-            Tu perfil de viajero
+            Tu guía personalizada
           </p>
           <SplitHeading
             as="h1"
@@ -41,13 +55,187 @@ export default function QuizResult() {
           >
             {perfilViajero}
           </SplitHeading>
-          <p className="mx-auto max-w-lg font-sans text-surface/80">
-            Basándome en tus respuestas, estas son las experiencias de Bolivia que van con vos.
+          <p className="mx-auto max-w-xl font-sans text-surface/80">
+            {resumenPerfil ??
+              'Basándome en tus respuestas, esta es la Bolivia hecha a tu medida.'}
           </p>
+
+          {/* Chips de intereses */}
+          {intereses && intereses.length > 0 && (
+            <ul className="mt-6 flex flex-wrap justify-center gap-2" aria-label="Tus intereses">
+              {intereses.map((tag) => (
+                <li
+                  key={tag}
+                  className="rounded-full border border-surface/30 bg-surface/10 px-3 py-1 font-sans text-xs uppercase tracking-[0.08em] text-surface/90"
+                >
+                  {tag.replace(/_/g, ' ')}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {/* Acción: imprimir / guardar guía */}
+          <div className="mt-8">
+            <Button
+              variant="secondary"
+              size="md"
+              onClick={() => window.print()}
+              className="border-surface/40 bg-surface/10 text-surface hover:bg-surface/20 rounded-full uppercase tracking-[0.06em] text-xs"
+            >
+              Imprimir / guardar mi guía
+            </Button>
+          </div>
         </RevealOnScroll>
       </section>
 
+      {/* Resumen del viaje — duración, época, presupuesto */}
+      {(duracionSugeridaDias || mejorEpoca || presupuesto) && (
+        <section
+          aria-label="Resumen del viaje"
+          className="border-b border-neutral/15 bg-surface px-4 py-10 md:px-8"
+        >
+          <div className="mx-auto grid max-w-5xl gap-6 sm:grid-cols-3">
+            {duracionSugeridaDias ? (
+              <RevealOnScroll className="text-center">
+                <p className="font-serif text-display-md font-bold text-primary">
+                  {duracionSugeridaDias}
+                  <span className="ml-1 text-lg font-semibold">
+                    {duracionSugeridaDias === 1 ? 'día' : 'días'}
+                  </span>
+                </p>
+                <p className="mt-1 font-sans text-xs uppercase tracking-[0.1em] text-neutral">
+                  Duración sugerida
+                </p>
+              </RevealOnScroll>
+            ) : null}
+
+            {mejorEpoca ? (
+              <RevealOnScroll delay={0.08} className="text-center">
+                <p className="font-serif text-lg font-semibold text-dark [text-wrap:balance]">
+                  {mejorEpoca.split('·')[0]}
+                </p>
+                <p className="mt-1 font-sans text-xs uppercase tracking-[0.1em] text-neutral">
+                  Mejor época
+                </p>
+                {mejorEpoca.includes('·') && (
+                  <p className="mt-2 font-sans text-xs leading-relaxed text-neutral/80">
+                    {mejorEpoca.split('·').slice(1).join('·').trim()}
+                  </p>
+                )}
+              </RevealOnScroll>
+            ) : null}
+
+            {presupuesto ? (
+              <RevealOnScroll delay={0.16} className="text-center">
+                <p className="font-serif text-lg font-semibold text-dark">
+                  {presupuesto.nivel}
+                </p>
+                <p className="mt-1 font-sans text-xs uppercase tracking-[0.1em] text-neutral">
+                  {presupuesto.rangoDiarioUsd}
+                </p>
+                <p className="mt-2 font-sans text-xs leading-relaxed text-neutral/80">
+                  {presupuesto.descripcion}
+                </p>
+              </RevealOnScroll>
+            ) : null}
+          </div>
+        </section>
+      )}
+
       <div className="mx-auto max-w-7xl px-4 py-12 md:px-8 space-y-16">
+        {/* Itinerario día por día — centro de la guía */}
+        {hasItinerario && (
+          <section aria-labelledby="itinerario-heading">
+            <RevealOnScroll>
+              <h2
+                id="itinerario-heading"
+                className="font-serif text-display-md font-bold text-dark mb-2 [text-wrap:balance]"
+              >
+                Tu itinerario optimizado
+              </h2>
+              <p className="mb-10 font-sans text-neutral">
+                Un recorrido día por día pensado para tu perfil, ordenado para minimizar
+                traslados entre regiones.
+              </p>
+            </RevealOnScroll>
+
+            <ol className="relative space-y-8 border-l-2 border-gold/30 pl-6 md:pl-10">
+              {itinerario.map((dia, i) => (
+                <RevealOnScroll as="li" key={`${dia.dia}-${dia.siteId}`} delay={i * 0.05}>
+                  {/* Marcador de día sobre la línea */}
+                  <span
+                    aria-hidden="true"
+                    className="absolute -left-[1.05rem] flex h-8 w-8 items-center justify-center rounded-full bg-gold font-serif text-xs font-bold text-dark shadow md:-left-[1.3rem]"
+                  >
+                    {dia.dia}
+                  </span>
+
+                  <article className="overflow-hidden rounded-2xl border border-neutral/12 bg-surface shadow-[0_2px_16px_rgba(34,28,24,0.06)]">
+                    <div className="md:flex">
+                      {/* Imagen */}
+                      <Link
+                        to={`/biblioteca/${dia.siteId}`}
+                        className="group block md:w-2/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                        aria-label={`Ver ${dia.nombreSitio} en la biblioteca`}
+                      >
+                        <div
+                          className="h-48 w-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105 md:h-full"
+                          style={{ backgroundImage: `url(${dia.imagenUrl})` }}
+                        />
+                      </Link>
+
+                      {/* Contenido */}
+                      <div className="flex-1 p-6 md:p-7">
+                        <div className="mb-2 flex flex-wrap items-center gap-2">
+                          <Badge variant="gold">Día {dia.dia}</Badge>
+                          <Badge variant="neutral">{dia.region}</Badge>
+                        </div>
+                        <h3 className="font-serif text-xl font-bold text-dark">{dia.titulo}</h3>
+                        <Link
+                          to={`/biblioteca/${dia.siteId}`}
+                          className="font-sans text-sm font-medium text-primary hover:underline"
+                        >
+                          {dia.nombreSitio}
+                        </Link>
+                        <p className="mt-2 font-sans text-sm leading-relaxed text-neutral">
+                          {dia.descripcion}
+                        </p>
+
+                        {/* Sub-filas: comida / experiencia / consejo */}
+                        <dl className="mt-4 space-y-2.5">
+                          {dia.comida && (
+                            <ItineraryRow
+                              label="Para comer"
+                              icon={
+                                <path d="M6 2v6a2 2 0 002 2h0V2M6 6h4M16 2c-1.5 0-3 1.5-3 4s1.5 4 3 4v6M9 14v4" />
+                              }
+                              text={dia.comida}
+                            />
+                          )}
+                          {dia.experiencia && (
+                            <ItineraryRow
+                              label="Para vivir"
+                              icon={<path d="M10 2l2.4 5 5.6.5-4.2 3.7 1.3 5.6L10 19l-5.1 2.8 1.3-5.6L2 12.5l5.6-.5L10 2z" />}
+                              text={dia.experiencia}
+                            />
+                          )}
+                          {dia.consejo && (
+                            <ItineraryRow
+                              label="Consejo"
+                              icon={<path d="M10 2a6 6 0 00-3 11v2a1 1 0 001 1h4a1 1 0 001-1v-2a6 6 0 00-3-11zM8 19h4" />}
+                              text={dia.consejo}
+                            />
+                          )}
+                        </dl>
+                      </div>
+                    </div>
+                  </article>
+                </RevealOnScroll>
+              ))}
+            </ol>
+          </section>
+        )}
+
         {/* Sección 1 — Lugares para ti */}
         {lugares.length > 0 && (
           <section aria-labelledby="lugares-heading">
@@ -251,5 +439,44 @@ export default function QuizResult() {
         </RevealOnScroll>
       </div>
     </main>
+  )
+}
+
+/** Fila de detalle dentro de una tarjeta de día del itinerario. */
+function ItineraryRow({
+  label,
+  icon,
+  text,
+}: {
+  label: string
+  icon: React.ReactNode
+  text: string
+}) {
+  return (
+    <div className="flex gap-3">
+      <dt className="flex-shrink-0">
+        <span className="sr-only">{label}</span>
+        <span
+          aria-hidden="true"
+          className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10"
+        >
+          <svg
+            className="h-3.5 w-3.5 text-primary"
+            viewBox="0 0 20 20"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            {icon}
+          </svg>
+        </span>
+      </dt>
+      <dd className="font-sans text-sm leading-relaxed text-neutral">
+        <span className="font-semibold text-dark">{label}: </span>
+        {text}
+      </dd>
+    </div>
   )
 }

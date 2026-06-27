@@ -224,5 +224,25 @@ describe('QuizService', () => {
       service.getRecommendation(arqueologoAnswers);
       expect(catalogService.getAll).toHaveBeenCalledTimes(1);
     });
+
+    it('genera un itinerario con días numerados y la duración coincide', () => {
+      const result = service.getRecommendation(arqueologoAnswers);
+      expect(Array.isArray(result.itinerario)).toBe(true);
+      expect(result.itinerario!.length).toBeGreaterThan(0);
+      expect(result.duracionSugeridaDias).toBe(result.itinerario!.length);
+      result.itinerario!.forEach((dia, i) => {
+        expect(dia.dia).toBe(i + 1);
+        expect(typeof dia.siteId).toBe('string');
+        expect(dia.siteId.length).toBeGreaterThan(0);
+      });
+    });
+
+    it('incluye presupuesto, mejor época e intereses en la guía', () => {
+      const result = service.getRecommendation(arqueologoAnswers);
+      expect(result.presupuesto).toBeDefined();
+      expect(typeof result.presupuesto!.nivel).toBe('string');
+      expect(typeof result.mejorEpoca).toBe('string');
+      expect(Array.isArray(result.intereses)).toBe(true);
+    });
   });
 });
