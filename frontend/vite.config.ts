@@ -73,4 +73,32 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  server: {
+    proxy: {
+      '/recognize': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        proxyTimeout: 60000,  // 60s — Gemini + TTS puede tardar
+        timeout: 60000,
+      },
+      '/catalog': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+      '/chat': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        proxyTimeout: 60000,
+        timeout: 60000,
+      },
+      '/quiz': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+      '/health': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+    },
+  },
 })

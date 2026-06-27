@@ -9,7 +9,8 @@ export class CatalogService {
   private readonly sites: Site[];
 
   constructor() {
-    const filePath = path.join(process.cwd(), 'data', 'sites.json');
+    // __dirname → dist/src/catalog → go up 3 levels to reach the project root
+    const filePath = path.join(__dirname, '..', '..', '..', 'data', 'sites.json');
     const raw = fs.readFileSync(filePath, 'utf-8');
     this.sites = JSON.parse(raw) as Site[];
   }
