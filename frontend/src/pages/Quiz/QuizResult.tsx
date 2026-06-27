@@ -5,12 +5,14 @@ import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { RevealOnScroll } from '@/components/motion/RevealOnScroll'
 import { SplitHeading } from '@/components/motion/SplitHeading'
+import { useT } from '@/context/LanguageContext'
 
 interface LocationState {
   recommendation: QuizRecommendation | null
 }
 
 export default function QuizResult() {
+  const t = useT()
   const location = useLocation()
   const navigate = useNavigate()
   const state = location.state as LocationState | null
@@ -46,7 +48,7 @@ export default function QuizResult() {
       >
         <RevealOnScroll>
           <p className="mb-2 font-sans text-sm font-medium uppercase tracking-wider text-surface/60">
-            Tu guía personalizada
+            {t('quiz.result.eyebrow')}
           </p>
           <SplitHeading
             as="h1"
@@ -56,13 +58,12 @@ export default function QuizResult() {
             {perfilViajero}
           </SplitHeading>
           <p className="mx-auto max-w-xl font-sans text-surface/80">
-            {resumenPerfil ??
-              'Basándome en tus respuestas, esta es la Bolivia hecha a tu medida.'}
+            {resumenPerfil ?? t('quiz.result.summaryFallback')}
           </p>
 
           {/* Chips de intereses */}
           {intereses && intereses.length > 0 && (
-            <ul className="mt-6 flex flex-wrap justify-center gap-2" aria-label="Tus intereses">
+            <ul className="mt-6 flex flex-wrap justify-center gap-2" aria-label={t('quiz.result.interestsAria')}>
               {intereses.map((tag) => (
                 <li
                   key={tag}
@@ -82,7 +83,7 @@ export default function QuizResult() {
               onClick={() => window.print()}
               className="border-surface/40 bg-surface/10 text-surface hover:bg-surface/20 rounded-full uppercase tracking-[0.06em] text-xs"
             >
-              Imprimir / guardar mi guía
+              {t('quiz.result.print')}
             </Button>
           </div>
         </RevealOnScroll>
@@ -91,7 +92,7 @@ export default function QuizResult() {
       {/* Resumen del viaje — duración, época, presupuesto */}
       {(duracionSugeridaDias || mejorEpoca || presupuesto) && (
         <section
-          aria-label="Resumen del viaje"
+          aria-label={t('quiz.result.summaryAria')}
           className="border-b border-neutral/15 bg-surface px-4 py-10 md:px-8"
         >
           <div className="mx-auto grid max-w-5xl gap-6 sm:grid-cols-3">
@@ -100,11 +101,11 @@ export default function QuizResult() {
                 <p className="font-serif text-display-md font-bold text-primary">
                   {duracionSugeridaDias}
                   <span className="ml-1 text-lg font-semibold">
-                    {duracionSugeridaDias === 1 ? 'día' : 'días'}
+                    {duracionSugeridaDias === 1 ? t('quiz.result.day') : t('quiz.result.days')}
                   </span>
                 </p>
                 <p className="mt-1 font-sans text-xs uppercase tracking-[0.1em] text-neutral">
-                  Duración sugerida
+                  {t('quiz.result.duration')}
                 </p>
               </RevealOnScroll>
             ) : null}
@@ -115,7 +116,7 @@ export default function QuizResult() {
                   {mejorEpoca.split('·')[0]}
                 </p>
                 <p className="mt-1 font-sans text-xs uppercase tracking-[0.1em] text-neutral">
-                  Mejor época
+                  {t('quiz.result.bestSeason')}
                 </p>
                 {mejorEpoca.includes('·') && (
                   <p className="mt-2 font-sans text-xs leading-relaxed text-neutral/80">
@@ -151,11 +152,10 @@ export default function QuizResult() {
                 id="itinerario-heading"
                 className="font-serif text-display-md font-bold text-dark mb-2 [text-wrap:balance]"
               >
-                Tu itinerario optimizado
+                {t('quiz.result.itinerary.title')}
               </h2>
               <p className="mb-10 font-sans text-neutral">
-                Un recorrido día por día pensado para tu perfil, ordenado para minimizar
-                traslados entre regiones.
+                {t('quiz.result.itinerary.subtitle')}
               </p>
             </RevealOnScroll>
 
@@ -176,7 +176,7 @@ export default function QuizResult() {
                       <Link
                         to={`/biblioteca/${dia.siteId}`}
                         className="group block md:w-2/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                        aria-label={`Ver ${dia.nombreSitio} en la biblioteca`}
+                        aria-label={t('quiz.result.viewInLibrary', { name: dia.nombreSitio })}
                       >
                         <div
                           className="h-48 w-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105 md:h-full"
@@ -187,7 +187,7 @@ export default function QuizResult() {
                       {/* Contenido */}
                       <div className="flex-1 p-6 md:p-7">
                         <div className="mb-2 flex flex-wrap items-center gap-2">
-                          <Badge variant="gold">Día {dia.dia}</Badge>
+                          <Badge variant="gold">{t('quiz.result.dayLabel')} {dia.dia}</Badge>
                           <Badge variant="neutral">{dia.region}</Badge>
                         </div>
                         <h3 className="font-serif text-xl font-bold text-dark">{dia.titulo}</h3>
@@ -205,7 +205,7 @@ export default function QuizResult() {
                         <dl className="mt-4 space-y-2.5">
                           {dia.comida && (
                             <ItineraryRow
-                              label="Para comer"
+                              label={t('quiz.result.row.eat')}
                               icon={
                                 <path d="M6 2v6a2 2 0 002 2h0V2M6 6h4M16 2c-1.5 0-3 1.5-3 4s1.5 4 3 4v6M9 14v4" />
                               }
@@ -214,14 +214,14 @@ export default function QuizResult() {
                           )}
                           {dia.experiencia && (
                             <ItineraryRow
-                              label="Para vivir"
+                              label={t('quiz.result.row.live')}
                               icon={<path d="M10 2l2.4 5 5.6.5-4.2 3.7 1.3 5.6L10 19l-5.1 2.8 1.3-5.6L2 12.5l5.6-.5L10 2z" />}
                               text={dia.experiencia}
                             />
                           )}
                           {dia.consejo && (
                             <ItineraryRow
-                              label="Consejo"
+                              label={t('quiz.result.row.tip')}
                               icon={<path d="M10 2a6 6 0 00-3 11v2a1 1 0 001 1h4a1 1 0 001-1v-2a6 6 0 00-3-11zM8 19h4" />}
                               text={dia.consejo}
                             />
@@ -244,10 +244,10 @@ export default function QuizResult() {
                 id="lugares-heading"
                 className="font-serif text-display-md font-bold text-dark mb-2 [text-wrap:balance]"
               >
-                Lugares para vos
+                {t('quiz.result.places.title')}
               </h2>
               <p className="mb-8 font-sans text-neutral">
-                Sitios turísticos que coinciden con tu estilo de viaje
+                {t('quiz.result.places.sub')}
               </p>
             </RevealOnScroll>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -291,10 +291,10 @@ export default function QuizResult() {
                 id="gastronomia-heading"
                 className="font-serif text-display-md font-bold text-dark mb-2 [text-wrap:balance]"
               >
-                Qué tenés que probar
+                {t('quiz.result.food.title')}
               </h2>
               <p className="mb-8 font-sans text-neutral">
-                La gastronomía boliviana que vas a adorar
+                {t('quiz.result.food.sub')}
               </p>
             </RevealOnScroll>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -312,7 +312,7 @@ export default function QuizResult() {
                         className="group-hover:scale-105"
                       />
                       <CardBody>
-                        <Badge variant="gold" className="mb-2">Gastronomía</Badge>
+                        <Badge variant="gold" className="mb-2">{t('quiz.result.food.badge')}</Badge>
                         <h3 className="font-serif text-lg font-semibold text-dark mb-1">
                           {site.nombre}
                         </h3>
@@ -336,10 +336,10 @@ export default function QuizResult() {
                 id="experiencias-heading"
                 className="font-serif text-display-md font-bold text-dark mb-2 [text-wrap:balance]"
               >
-                Qué tenés que vivir
+                {t('quiz.result.exp.title')}
               </h2>
               <p className="mb-8 font-sans text-neutral">
-                Danzas, festivales y tradiciones que van con tu espíritu
+                {t('quiz.result.exp.sub')}
               </p>
             </RevealOnScroll>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -358,7 +358,7 @@ export default function QuizResult() {
                       />
                       <CardBody>
                         <Badge variant="surface" className="mb-2">
-                          {site.categoria === 'danza' ? 'Danza' : 'Festividad'}
+                          {site.categoria === 'danza' ? t('quiz.result.exp.dance') : t('quiz.result.exp.festivity')}
                         </Badge>
                         <h3 className="font-serif text-lg font-semibold text-surface mb-1">
                           {site.nombre}
@@ -383,10 +383,10 @@ export default function QuizResult() {
                 id="tips-heading"
                 className="font-serif text-display-md font-bold text-dark mb-2 [text-wrap:balance]"
               >
-                Consejos para tu viaje
+                {t('quiz.result.tips.title')}
               </h2>
               <p className="mb-8 font-sans text-neutral">
-                Tips prácticos seleccionados especialmente para tu perfil
+                {t('quiz.result.tips.sub')}
               </p>
             </RevealOnScroll>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -426,14 +426,14 @@ export default function QuizResult() {
         {/* CTAs finales */}
         <RevealOnScroll className="border-t border-neutral/15 pt-12 text-center">
           <p className="mb-6 font-sans text-neutral">
-            ¿Querés explorar más opciones o repetir el quiz?
+            {t('quiz.result.cta.text')}
           </p>
           <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
             <Link to="/biblioteca">
-              <Button variant="primary" size="lg">Explorar la Biblioteca completa</Button>
+              <Button variant="primary" size="lg">{t('quiz.result.cta.library')}</Button>
             </Link>
             <Button variant="secondary" size="lg" onClick={() => navigate('/quiz')}>
-              Repetir el quiz
+              {t('quiz.result.cta.repeat')}
             </Button>
           </div>
         </RevealOnScroll>

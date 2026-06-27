@@ -1,5 +1,6 @@
 import { RevealOnScroll } from '@/components/motion/RevealOnScroll'
 import { SplitHeading } from '@/components/motion/SplitHeading'
+import { useT } from '@/context/LanguageContext'
 
 /**
  * EditorialText — seccion de texto largo con grilla asimetrica
@@ -11,6 +12,7 @@ import { SplitHeading } from '@/components/motion/SplitHeading'
  * Inspirado en Flyward: texto como elemento de diseno, no solo contenido.
  */
 export function EditorialText() {
+  const t = useT()
   return (
     <section
       aria-labelledby="editorial-heading"
@@ -37,7 +39,7 @@ export function EditorialText() {
                 id="editorial-heading"
                 className="font-serif text-display-lg font-bold uppercase tracking-[0.04em] text-dark [text-wrap:balance] leading-tight"
               >
-                Tecnologia al servicio de la cultura
+                {t('editorial.title')}
               </SplitHeading>
             </RevealOnScroll>
           </div>
@@ -47,20 +49,14 @@ export function EditorialText() {
             {/* Parrafo 1 — col 1-7 */}
             <RevealOnScroll className="md:col-span-7" delay={0.1}>
               <p className="font-sans text-base leading-relaxed text-neutral [text-wrap:pretty]">
-                Munay Map combina Vision AI para reconocer sitios culturales en tiempo real,
-                Gemini para generar explicaciones ricas y culturalmente precisas, y
-                Text-to-Speech para narrarlas en mas de 40 idiomas. Todo desde la camara
-                del telefono del turista.
+                {t('editorial.p1')}
               </p>
             </RevealOnScroll>
 
             {/* Parrafo 2 — col 4-12 (desplazado hacia la derecha) */}
             <RevealOnScroll className="md:col-span-8 md:col-start-5" delay={0.2}>
               <p className="font-sans text-base leading-relaxed text-neutral [text-wrap:pretty]">
-                El patrimonio boliviano abarca mas de 2.000 anos de historia: desde las ruinas
-                precolombinas de Tiwanaku hasta los carnavales declarados Patrimonio de la
-                Humanidad por la UNESCO. Munay Map hace que cada uno de esos lugares sea
-                accesible para cualquier turista del mundo.
+                {t('editorial.p2')}
               </p>
             </RevealOnScroll>
 
@@ -68,8 +64,7 @@ export function EditorialText() {
             <RevealOnScroll className="md:col-span-6 md:col-start-7" delay={0.3}>
               <blockquote className="border-l-2 border-gold pl-5">
                 <p className="font-serif text-lg italic text-dark/70 leading-relaxed">
-                  "Cualquier turista, en cualquier idioma, puede entender la historia
-                  que tiene frente a sus ojos."
+                  {t('editorial.quote')}
                 </p>
               </blockquote>
             </RevealOnScroll>

@@ -2,6 +2,7 @@ import { useRef, useEffect } from 'react'
 import { gsap } from '@/lib/gsap'
 import { prefersReducedMotion } from '@/lib/utils'
 import { SplitHeading } from '@/components/motion/SplitHeading'
+import { useT } from '@/context/LanguageContext'
 
 /**
  * CinematicSky — equivalente boliviano de la seccion "Travel Simple" de Flyward.
@@ -21,6 +22,7 @@ import { SplitHeading } from '@/components/motion/SplitHeading'
  * prefers-reduced-motion: sin parallax y la ruta se muestra ya dibujada.
  */
 export function CinematicSky() {
+  const t = useT()
   const sectionRef = useRef<HTMLElement>(null)
   const skyRef = useRef<HTMLDivElement>(null)
   const ghostRef = useRef<HTMLDivElement>(null)
@@ -163,14 +165,14 @@ export function CinematicSky() {
           letterSpacing: '0.12em',
         }}
       >
-        Patrimonio vivo
+        {t('cinematic.ghost')}
       </div>
 
       {/* z5 — Contenido */}
       <div className="relative z-10 mx-auto flex h-full max-w-7xl flex-col justify-center px-6 md:px-10">
         <div className="max-w-2xl">
           <p className="mb-5 font-sans text-xs font-medium uppercase tracking-[0.22em] text-gold">
-            Un solo gesto
+            {t('cinematic.eyebrow')}
           </p>
           <SplitHeading
             as="h2"
@@ -178,12 +180,10 @@ export function CinematicSky() {
             className="font-serif text-display-xl font-semibold leading-[1.05] text-surface [text-wrap:balance]"
             stagger={0.06}
           >
-            Viaja sin barreras de idioma
+            {t('cinematic.title')}
           </SplitHeading>
           <p className="mt-6 max-w-lg font-sans text-base leading-relaxed text-surface/70 [text-wrap:pretty]">
-            Apunta la camara a un templo, una danza o un plato y recibe su historia
-            narrada en tu idioma. La distancia entre tu y la cultura boliviana se reduce
-            a una fotografia.
+            {t('cinematic.body')}
           </p>
         </div>
       </div>

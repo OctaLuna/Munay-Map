@@ -3,13 +3,14 @@ import { gsap } from '@/lib/gsap'
 import { prefersReducedMotion } from '@/lib/utils'
 import { CounterUp } from '@/components/motion/CounterUp'
 import { RevealOnScroll } from '@/components/motion/RevealOnScroll'
+import { useT } from '@/context/LanguageContext'
 
 const STATS = [
-  { target: 200, suffix: '+', label: 'Sitios catalogados', prefix: '' },
-  { target: 9, suffix: '', label: 'Departamentos', prefix: '' },
-  { target: 40, suffix: '+', label: 'Idiomas disponibles', prefix: '' },
-  { target: 2000, suffix: '+', label: 'Anos de historia', prefix: '' },
-]
+  { target: 200, suffix: '+', labelKey: 'stats.sites', prefix: '' },
+  { target: 9, suffix: '', labelKey: 'stats.depts', prefix: '' },
+  { target: 40, suffix: '+', labelKey: 'stats.langs', prefix: '' },
+  { target: 2000, suffix: '+', labelKey: 'stats.years', prefix: '' },
+] as const
 
 // Foto del altiplano boliviano — Salar de Uyuni al atardecer
 const BG_IMAGE =
@@ -21,6 +22,7 @@ const BG_IMAGE =
  * Overlay oscuro para legibilidad del texto en blanco.
  */
 export function StatsCounter() {
+  const t = useT()
   const lineRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -60,7 +62,7 @@ export function StatsCounter() {
       <div className="relative z-10 mx-auto max-w-7xl">
         <RevealOnScroll>
           <h2 id="stats-heading" className="sr-only">
-            Estadisticas del proyecto
+            {t('stats.aria')}
           </h2>
         </RevealOnScroll>
 
@@ -72,9 +74,9 @@ export function StatsCounter() {
 
         <dl className="grid grid-cols-2 gap-10 lg:grid-cols-4">
           {STATS.map((stat) => (
-            <div key={stat.label} className="text-center">
+            <div key={stat.labelKey} className="text-center">
               <dt className="order-2 mt-2 text-sm font-medium text-surface/60 font-sans uppercase tracking-[0.08em]">
-                {stat.label}
+                {t(stat.labelKey)}
               </dt>
               <dd className="order-1 font-serif text-display-lg font-bold text-gold">
                 <CounterUp
@@ -82,7 +84,7 @@ export function StatsCounter() {
                   suffix={stat.suffix}
                   prefix={stat.prefix}
                   duration={2.5}
-                  label={`${stat.target}${stat.suffix} ${stat.label}`}
+                  label={`${stat.target}${stat.suffix} ${t(stat.labelKey)}`}
                 />
               </dd>
             </div>

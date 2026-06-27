@@ -10,7 +10,7 @@ import type { Language } from '@/types'
  * Patrón: posición absoluta con detección de espacio disponible.
  */
 export function LanguageSwitcher() {
-  const { language, setLanguage } = useLanguage()
+  const { language, setLanguage, t } = useLanguage()
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -91,14 +91,14 @@ export function LanguageSwitcher() {
         <div
           ref={dialogRef}
           role="dialog"
-          aria-label="Seleccionar idioma"
+          aria-label={t('nav.aria.language')}
           className="absolute right-0 top-full z-[var(--z-dropdown,100)] mt-2 w-64 rounded-xl border border-neutral/20 bg-surface shadow-[0_4px_16px_rgba(34,28,24,0.15)]"
           style={{ zIndex: 100 }}
         >
           {/* Buscador */}
           <div className="border-b border-neutral/15 p-2">
             <label htmlFor={inputId} className="sr-only">
-              Buscar idioma
+              {t('nav.language.searchLabel')}
             </label>
             <input
               ref={inputRef}
@@ -106,7 +106,7 @@ export function LanguageSwitcher() {
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Buscar idioma..."
+              placeholder={t('nav.language.search')}
               autoComplete="off"
               className="w-full rounded-lg border border-neutral/20 bg-background px-3 py-1.5 text-sm text-dark placeholder:text-neutral/50 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
@@ -116,11 +116,11 @@ export function LanguageSwitcher() {
           <ul
             id={listboxId}
             role="listbox"
-            aria-label="Idiomas disponibles"
+            aria-label={t('nav.language.available')}
             className="max-h-56 overflow-y-auto py-1"
           >
             {filtered.length === 0 && (
-              <li className="px-3 py-2 text-sm text-neutral/60">Sin resultados</li>
+              <li className="px-3 py-2 text-sm text-neutral/60">{t('nav.language.empty')}</li>
             )}
             {filtered.map((lang) => (
               <li key={lang.code} role="option" aria-selected={lang.code === language.code}>

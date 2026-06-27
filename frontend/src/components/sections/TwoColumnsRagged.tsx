@@ -4,6 +4,7 @@ import { prefersReducedMotion } from '@/lib/utils'
 import { SplitHeading } from '@/components/motion/SplitHeading'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/Button'
+import { useT } from '@/context/LanguageContext'
 
 const TORN_PATH =
   'M 52 0 C 38 35, 64 70, 46 110 C 32 145, 60 185, 50 225 C 38 268, 63 308, 48 348 C 35 385, 62 425, 50 465 C 38 505, 61 545, 52 585 C 44 620, 55 640, 52 660 L 100 660 L 100 0 Z'
@@ -18,6 +19,7 @@ const TORN_PATH =
  * En mobile: columnas apiladas verticalmente, sin divisor SVG.
  */
 export function TwoColumnsRagged() {
+  const t = useT()
   const dividerRef = useRef<SVGPathElement>(null)
   const sectionRef = useRef<HTMLElement>(null)
 
@@ -45,7 +47,7 @@ export function TwoColumnsRagged() {
       className="relative h-[70vh] min-h-[520px] overflow-hidden"
     >
       <h2 id="two-columns-heading" className="sr-only">
-        Lugares y sabores de Bolivia
+        {t('twocol.aria')}
       </h2>
 
       {/* Columna izquierda — foto de Tiwanaku/salar, Lugares */}
@@ -65,17 +67,17 @@ export function TwoColumnsRagged() {
             as="h3"
             className="font-serif text-display-md font-bold uppercase tracking-[0.05em] text-surface [text-wrap:balance] mb-3"
           >
-            Lugares para explorar
+            {t('twocol.places.title')}
           </SplitHeading>
           <p className="mb-6 max-w-xs font-sans text-sm leading-relaxed text-surface/80 hidden md:block">
-            Desde las ruinas milenarias de Tiwanaku hasta el infinito Salar de Uyuni.
+            {t('twocol.places.body')}
           </p>
           <Link to="/biblioteca?categoria=sitio_turistico">
             <Button
               size="sm"
               className="rounded-full bg-surface text-dark hover:bg-surface/90 uppercase tracking-[0.06em] text-[12px] px-6 w-fit"
             >
-              Explorar
+              {t('twocol.explore')}
             </Button>
           </Link>
         </div>
@@ -98,17 +100,17 @@ export function TwoColumnsRagged() {
             className="font-serif text-display-md font-bold uppercase tracking-[0.05em] text-surface [text-wrap:balance] mb-3"
             delay={0.1}
           >
-            Sabores para descubrir
+            {t('twocol.flavors.title')}
           </SplitHeading>
           <p className="mb-6 max-w-xs font-sans text-sm leading-relaxed text-surface/80 hidden md:block">
-            El chuño lleva 2.000 años en el altiplano. El salteño, el silpancho, el tucuman.
+            {t('twocol.flavors.body')}
           </p>
           <Link to="/biblioteca?categoria=gastronomia">
             <Button
               size="sm"
               className="rounded-full bg-surface text-dark hover:bg-surface/90 uppercase tracking-[0.06em] text-[12px] px-6 w-fit"
             >
-              Explorar
+              {t('twocol.explore')}
             </Button>
           </Link>
         </div>

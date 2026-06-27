@@ -1,14 +1,15 @@
 import { useState, useEffect, useCallback } from 'react'
 import { NavLink, Link } from 'react-router-dom'
 import { cn } from '@/lib/utils'
+import { useT } from '@/context/LanguageContext'
 import { Button } from '@/components/ui/Button'
 import { LanguageSwitcher } from './LanguageSwitcher'
 
 const NAV_LINKS = [
-  { to: '/', label: 'Inicio', end: true },
-  { to: '/biblioteca', label: 'Biblioteca', end: false },
-  { to: '/quiz', label: 'Tu Guía Personalizada', end: false },
-]
+  { to: '/', labelKey: 'nav.home', end: true },
+  { to: '/biblioteca', labelKey: 'nav.library', end: false },
+  { to: '/quiz', labelKey: 'nav.guide', end: false },
+] as const
 
 /**
  * Navbar — estilo Flyward
@@ -26,6 +27,7 @@ const NAV_LINKS = [
  * CTA: rounded-full (pildora), misma tipografia que los links.
  */
 export function Navbar() {
+  const t = useT()
   // 'dark' = texto claro (sobre fotos/secciones oscuras)
   // 'light' = texto oscuro (sobre fondo beige/crema)
   const [navTheme, setNavTheme] = useState<'light' | 'dark'>('light')
@@ -98,7 +100,7 @@ export function Navbar() {
       />
 
       <nav
-        aria-label="Navegacion principal"
+        aria-label={t('nav.aria.primary')}
         className="relative mx-auto flex max-w-7xl items-center justify-between px-6 py-4 md:px-10"
       >
         {/* Links izquierda — desktop */}
@@ -118,7 +120,7 @@ export function Navbar() {
                   )
                 }
               >
-                {link.label}
+                {t(link.labelKey)}
               </NavLink>
             </li>
           ))}
@@ -127,7 +129,7 @@ export function Navbar() {
         {/* Logo centro — solo tipografia, sin icono elaborado */}
         <Link
           to="/"
-          aria-label="Munay Map — Inicio"
+          aria-label={t('nav.aria.brand')}
           onClick={closeMobile}
           className={cn(
             'absolute left-1/2 -translate-x-1/2 rounded-sm',
@@ -162,11 +164,11 @@ export function Navbar() {
             )}
             onClick={() => (window.location.href = '/camara')}
           >
-            Probar la camara
+            {t('nav.tryCamera')}
           </Button>
           {/* Hamburger — mobile */}
           <button
-            aria-label={mobileOpen ? 'Cerrar menu' : 'Abrir menu'}
+            aria-label={mobileOpen ? t('nav.closeMenu') : t('nav.openMenu')}
             aria-expanded={mobileOpen}
             aria-controls="mobile-menu"
             onClick={() => setMobileOpen((v) => !v)}
@@ -202,7 +204,7 @@ export function Navbar() {
         <div
           id="mobile-menu"
           role="navigation"
-          aria-label="Menu mobile"
+          aria-label={t('nav.aria.mobile')}
           className="border-t border-dark/10 bg-background/98 px-6 pb-5 pt-3 backdrop-blur-sm md:hidden"
         >
           <ul role="list" className="space-y-1">
@@ -221,7 +223,7 @@ export function Navbar() {
                     )
                   }
                 >
-                  {link.label}
+                  {t(link.labelKey)}
                 </NavLink>
               </li>
             ))}
@@ -234,7 +236,7 @@ export function Navbar() {
                   window.location.href = '/camara'
                 }}
               >
-                Probar la camara
+                {t('nav.tryCamera')}
               </Button>
             </li>
           </ul>

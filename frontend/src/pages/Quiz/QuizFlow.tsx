@@ -10,7 +10,7 @@ import { RevealOnScroll } from '@/components/motion/RevealOnScroll'
 export default function QuizFlow() {
   const { data: questions, isLoading } = useQuizQuestions()
   const { mutate: getRecommendation, isPending } = useQuizRecommendation()
-  const { language } = useLanguage()
+  const { language, t } = useLanguage()
   const navigate = useNavigate()
 
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -24,7 +24,7 @@ export default function QuizFlow() {
           <div className="mx-auto mb-4 h-8 w-48 rounded bg-surface/60" />
           <div className="mx-auto h-4 w-64 rounded bg-surface/60" />
         </div>
-        <span className="sr-only">Cargando preguntas del quiz...</span>
+        <span className="sr-only">{t('quiz.flow.loading')}</span>
       </main>
     )
   }
@@ -88,7 +88,7 @@ export default function QuizFlow() {
         {/* Progreso */}
         <div className="mb-8">
           <div className="mb-3 flex items-center justify-between text-sm font-sans text-neutral">
-            <span>Pregunta {currentIndex + 1} de {totalQuestions}</span>
+            <span>{t('quiz.flow.progress', { current: currentIndex + 1, total: totalQuestions })}</span>
             <span>{Math.round(progress)}%</span>
           </div>
           <ProgressBar value={progress} animate />
@@ -149,9 +149,9 @@ export default function QuizFlow() {
             size="md"
             onClick={handleBack}
             disabled={currentIndex === 0}
-            aria-label="Pregunta anterior"
+            aria-label={t('quiz.flow.prevAria')}
           >
-            ← Anterior
+            {t('quiz.flow.back')}
           </Button>
 
           <Button
@@ -161,7 +161,7 @@ export default function QuizFlow() {
             disabled={!selectedOptionId || isPending}
             loading={isPending && isLastQuestion}
           >
-            {isLastQuestion ? 'Ver mi recomendación' : 'Siguiente →'}
+            {isLastQuestion ? t('quiz.flow.finish') : t('quiz.flow.next')}
           </Button>
         </div>
       </div>

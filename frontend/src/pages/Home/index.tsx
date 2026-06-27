@@ -10,12 +10,13 @@ import { Marquee } from '@/components/ui/Marquee'
 import { RevealOnScroll } from '@/components/motion/RevealOnScroll'
 import { SplitHeading } from '@/components/motion/SplitHeading'
 import { Button } from '@/components/ui/Button'
+import { useT } from '@/context/LanguageContext'
 
 const TECH_ITEMS = [
-  { name: 'Vision AI', desc: 'Reconocimiento de imagenes' },
-  { name: 'Gemini', desc: 'Explicaciones generadas por IA' },
-  { name: 'Text-to-Speech', desc: 'Audio en tu idioma' },
-  { name: 'Cloud Run', desc: 'Infraestructura en la nube' },
+  { name: 'Vision AI', descKey: 'home.tech.vision' },
+  { name: 'Gemini', descKey: 'home.tech.gemini' },
+  { name: 'Text-to-Speech', descKey: 'home.tech.tts' },
+  { name: 'Cloud Run', descKey: 'home.tech.cloud' },
 ]
 
 const DEPARTMENTS = [
@@ -24,6 +25,7 @@ const DEPARTMENTS = [
 ]
 
 export default function HomePage() {
+  const t = useT()
   return (
     <main id="main-content">
       {/* 1. Hero — data-nav-theme="light": fondo beige, texto oscuro */}
@@ -44,16 +46,12 @@ export default function HomePage() {
               id="what-we-solve-heading"
               className="font-serif text-display-lg font-bold uppercase tracking-[0.04em] text-dark [text-wrap:balance] mb-6"
             >
-              El problema que resolvemos
+              {t('home.problem.title')}
             </SplitHeading>
           </RevealOnScroll>
           <RevealOnScroll delay={0.1}>
             <p className="text-base leading-relaxed text-neutral font-sans [text-wrap:pretty]">
-              Bolivia tiene un patrimonio cultural inmenso, pero la barrera del idioma y la 
-              falta de guias especializados impiden que los turistas internacionales accedan 
-              a la riqueza de cada lugar. Munay Map elimina esa barrera: 
-              cualquier turista, en cualquier idioma, puede entender la historia 
-              que tiene frente a sus ojos.
+              {t('home.problem.body')}
             </p>
           </RevealOnScroll>
         </div>
@@ -82,7 +80,7 @@ export default function HomePage() {
       {/* 6. Marquee de tecnologias — fondo surface (crema), texto oscuro */}
       <section
         data-nav-theme="light"
-        aria-label="Tecnologias utilizadas"
+        aria-label={t('home.tech.aria')}
         className="border-y border-neutral/15 bg-surface py-8"
       >
         <Marquee
@@ -94,7 +92,7 @@ export default function HomePage() {
             <div className="flex items-center gap-3 px-8">
               <span className="h-1.5 w-1.5 rounded-full bg-gold" aria-hidden="true" />
               <span className="font-serif text-lg font-semibold text-dark">{item.name}</span>
-              <span className="font-sans text-sm text-neutral">{item.desc}</span>
+              <span className="font-sans text-sm text-neutral">{t(item.descKey)}</span>
             </div>
           )}
         />
@@ -103,7 +101,7 @@ export default function HomePage() {
       {/* Marquee de departamentos — fondo oscuro, texto claro */}
       <section
         data-nav-theme="dark"
-        aria-label="Departamentos de Bolivia"
+        aria-label={t('home.depts.aria')}
         className="bg-dark py-5"
       >
         <Marquee
@@ -143,13 +141,12 @@ export default function HomePage() {
               id="quiz-cta-heading"
               className="font-serif text-display-lg font-bold uppercase tracking-[0.04em] text-surface [text-wrap:balance] mb-6"
             >
-              No sabes por donde empezar
+              {t('home.cta.title')}
             </SplitHeading>
           </RevealOnScroll>
           <RevealOnScroll delay={0.1}>
             <p className="mb-10 text-lg text-surface/80 font-sans">
-              Responde 6 preguntas y recibis un itinerario personalizado con 
-              los sitios, sabores y experiencias que van con tu estilo de viaje.
+              {t('home.cta.body')}
             </p>
           </RevealOnScroll>
           <RevealOnScroll delay={0.2}>
@@ -158,7 +155,7 @@ export default function HomePage() {
                 size="lg"
                 className="bg-surface text-primary hover:bg-surface/90 focus-visible:ring-surface rounded-full px-10 uppercase tracking-[0.08em] text-sm"
               >
-                Empezar el quiz — 2 minutos
+                {t('home.cta.button')}
               </Button>
             </Link>
           </RevealOnScroll>

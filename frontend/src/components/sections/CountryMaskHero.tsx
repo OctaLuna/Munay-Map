@@ -6,6 +6,7 @@ import { prefersReducedMotion } from '@/lib/utils'
 import { SplitHeading } from '@/components/motion/SplitHeading'
 import { Button } from '@/components/ui/Button'
 import { Link } from 'react-router-dom'
+import { useT } from '@/context/LanguageContext'
 
 interface CountryMaskHeroProps {
   backgroundImageSrc?: string
@@ -34,6 +35,7 @@ export function CountryMaskHero({
   backgroundImageSrc = DEFAULT_BG,
   maskColor = '#F4E8D3',
 }: CountryMaskHeroProps) {
+  const t = useT()
   const heroSectionRef = useRef<HTMLElement>(null)
   const maskGroupRef = useRef<SVGGElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
@@ -160,12 +162,11 @@ export function CountryMaskHero({
               stagger={0.04}
               delay={0.2}
             >
-              Bolivia tiene mil historias que contar.
+              {t('hero.title')}
             </SplitHeading>
 
             <p className="mx-auto mb-8 max-w-md text-base text-dark/60 font-sans leading-relaxed">
-              Explorá su patrimonio cultural con inteligencia artificial.
-              Reconocé sitios, entendé su historia en tu idioma y descubrí tu viaje ideal.
+              {t('hero.subtitle')}
             </p>
 
             <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
@@ -174,7 +175,7 @@ export function CountryMaskHero({
                   size="lg"
                   className="bg-dark text-surface hover:bg-dark/80 border-dark rounded-full px-8"
                 >
-                  Descubrir
+                  {t('hero.cta.discover')}
                 </Button>
               </Link>
               <Link to="/quiz">
@@ -183,7 +184,7 @@ export function CountryMaskHero({
                   variant="secondary"
                   className="border-dark/30 text-dark hover:bg-dark/5 rounded-full px-8"
                 >
-                  Hacer el quiz
+                  {t('hero.cta.quiz')}
                 </Button>
               </Link>
             </div>
@@ -193,7 +194,7 @@ export function CountryMaskHero({
             aria-hidden="true"
             className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-dark/30"
           >
-            <span className="text-xs font-sans tracking-widest uppercase">Explorar</span>
+            <span className="text-xs font-sans tracking-widest uppercase">{t('hero.scroll')}</span>
             <svg
               className="h-5 w-5 animate-bounce"
               viewBox="0 0 20 20"

@@ -3,13 +3,13 @@ import { gsap } from '@/lib/gsap'
 import { prefersReducedMotion } from '@/lib/utils'
 import { SplitHeading } from '@/components/motion/SplitHeading'
 import { BOLIVIA_MASK_PATH, MASK_VIEWBOX } from '@/assets/masks/boliviaMask'
+import { useT } from '@/context/LanguageContext'
 
 const STEPS = [
   {
     numero: '01',
-    titulo: 'Tomas una foto',
-    descripcion:
-      'Apunta tu camara a cualquier sitio cultural, monumento, plato tipico o elemento de una festividad boliviana.',
+    tituloKey: 'steps.1.title',
+    descKey: 'steps.1.desc',
     icono: (
       <svg className="h-8 w-8" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
         <rect x="4" y="8" width="24" height="18" rx="3" />
@@ -20,9 +20,8 @@ const STEPS = [
   },
   {
     numero: '02',
-    titulo: 'Identificamos el lugar',
-    descripcion:
-      'Nuestra IA analiza la imagen en segundos y la compara con nuestra base de datos cultural boliviana.',
+    tituloKey: 'steps.2.title',
+    descKey: 'steps.2.desc',
     icono: (
       <svg className="h-8 w-8" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
         <circle cx="14" cy="14" r="8" />
@@ -33,9 +32,8 @@ const STEPS = [
   },
   {
     numero: '03',
-    titulo: 'Te explicamos su historia',
-    descripcion:
-      'Recibis una explicacion detallada generada por IA: origen, significado cultural, datos curiosos y recomendaciones.',
+    tituloKey: 'steps.3.title',
+    descKey: 'steps.3.desc',
     icono: (
       <svg className="h-8 w-8" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
         <path d="M6 4h14l6 6v18H6V4z" />
@@ -46,9 +44,8 @@ const STEPS = [
   },
   {
     numero: '04',
-    titulo: 'Lo escuchas en tu idioma',
-    descripcion:
-      'La explicacion se traduce y narra en tu idioma preferido entre 40 disponibles. Tecnologia Text-to-Speech de Google Cloud.',
+    tituloKey: 'steps.4.title',
+    descKey: 'steps.4.desc',
     icono: (
       <svg className="h-8 w-8" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
         <path d="M4 12h6l4-8v24l-4-8H4z" />
@@ -75,6 +72,7 @@ const JOURNEY_PATH =
  * prefers-reduced-motion: todo visible, sin trazos ni rebotes.
  */
 export function JourneySteps() {
+  const t = useT()
   const sectionRef = useRef<HTMLElement>(null)
   const pathRef = useRef<SVGPathElement>(null)
   const stepsRef = useRef<(HTMLDivElement | null)[]>([])
@@ -170,10 +168,10 @@ export function JourneySteps() {
             id="steps-heading"
             className="mb-4 font-serif text-display-lg font-bold uppercase tracking-[0.04em] text-dark [text-wrap:balance]"
           >
-            Como funciona
+            {t('steps.title')}
           </SplitHeading>
           <p className="mx-auto max-w-xl font-sans text-neutral">
-            Cuatro pasos para convertir cualquier rincon de Bolivia en una experiencia de aprendizaje.
+            {t('steps.subtitle')}
           </p>
         </div>
 
@@ -220,8 +218,8 @@ export function JourneySteps() {
 
                 <div className="mb-5 text-primary">{step.icono}</div>
 
-                <h3 className="mb-3 font-serif text-lg font-semibold text-dark">{step.titulo}</h3>
-                <p className="font-sans text-sm leading-relaxed text-neutral">{step.descripcion}</p>
+                <h3 className="mb-3 font-serif text-lg font-semibold text-dark">{t(step.tituloKey)}</h3>
+                <p className="font-sans text-sm leading-relaxed text-neutral">{t(step.descKey)}</p>
               </div>
             ))}
           </div>

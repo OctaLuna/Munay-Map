@@ -2,33 +2,13 @@ import { useRef, useState, useEffect } from 'react'
 import { gsap } from '@/lib/gsap'
 import { prefersReducedMotion } from '@/lib/utils'
 import { RevealOnScroll } from '@/components/motion/RevealOnScroll'
+import { useT } from '@/context/LanguageContext'
 
 const TESTIMONIALS = [
-  {
-    id: 't1',
-    texto:
-      '"Llegué a Tiwanaku sin saber nada sobre el lugar. Tomé una foto con la app y en segundos tenía toda la historia en japonés. Increíble."',
-    nombre: 'Kenji T.',
-    pais: 'Japón',
-    bandera: '🇯🇵',
-  },
-  {
-    id: 't2',
-    texto:
-      '"El quiz me recomendó el Salar de Uyuni y el Carnaval de Oruro. Hice los dos y fue el viaje más memorable de mi vida."',
-    nombre: 'Laura M.',
-    pais: 'Argentina',
-    bandera: '🇦🇷',
-  },
-  {
-    id: 't3',
-    texto:
-      '"Viajé con mi familia y los chicos quedaron fascinados escuchando las historias en su idioma. La herramienta es perfecta para turistas con niños."',
-    nombre: 'Hans K.',
-    pais: 'Alemania',
-    bandera: '🇩🇪',
-  },
-]
+  { id: 't1', textKey: 'testimonials.t1.text', nombre: 'Kenji T.', countryKey: 'testimonials.t1.country', bandera: '🇯🇵' },
+  { id: 't2', textKey: 'testimonials.t2.text', nombre: 'Laura M.', countryKey: 'testimonials.t2.country', bandera: '🇦🇷' },
+  { id: 't3', textKey: 'testimonials.t3.text', nombre: 'Hans K.', countryKey: 'testimonials.t3.country', bandera: '🇩🇪' },
+] as const
 
 /**
  * TestimonialSlider — patrón 9
@@ -36,6 +16,7 @@ const TESTIMONIALS = [
  * [PENDIENTE] Testimoniales reales — los actuales son placeholders.
  */
 export function TestimonialSlider() {
+  const t = useT()
   const [current, setCurrent] = useState(0)
   const trackRef = useRef<HTMLDivElement>(null)
   const isDragging = useRef(false)
@@ -95,18 +76,17 @@ export function TestimonialSlider() {
             id="testimonials-heading"
             className="font-serif text-display-md font-bold text-dark [text-wrap:balance]"
           >
-            Lo que dicen los viajeros
+            {t('testimonials.title')}
           </h2>
           <p className="mt-3 text-neutral font-sans text-sm">
-            {/* [PENDIENTE] Testimoniales reales de usuarios */}
-            [PENDIENTE] Testimoniales reales · Placeholders actuales
+            {t('testimonials.subtitle')}
           </p>
         </RevealOnScroll>
 
         <div
           className="relative overflow-hidden rounded-2xl"
           role="region"
-          aria-label="Carrusel de testimoniales"
+          aria-label={t('testimonials.aria.region')}
           aria-live="polite"
         >
           <div
@@ -116,20 +96,20 @@ export function TestimonialSlider() {
             onPointerUp={handlePointerUp}
             style={{ cursor: 'grab' }}
           >
-            {TESTIMONIALS.map((t) => (
+            {TESTIMONIALS.map((item) => (
               <div
-                key={t.id}
+                key={item.id}
                 className="w-full flex-shrink-0 px-4 py-12 text-center bg-background rounded-2xl"
-                aria-label={`Testimonio de ${t.nombre}`}
+                aria-label={`${item.nombre} · ${t(item.countryKey)}`}
               >
                 <blockquote className="mx-auto max-w-prose">
                   <p className="font-serif text-xl italic text-dark leading-relaxed [text-wrap:pretty]">
-                    {t.texto}
+                    {t(item.textKey)}
                   </p>
                   <footer className="mt-6">
-                    <span aria-hidden="true" className="text-3xl">{t.bandera}</span>
+                    <span aria-hidden="true" className="text-3xl">{item.bandera}</span>
                     <cite className="mt-2 block font-sans text-sm font-semibold text-neutral not-italic">
-                      {t.nombre} · {t.pais}
+                      {item.nombre} · {t(item.countryKey)}
                     </cite>
                   </footer>
                 </blockquote>
@@ -142,7 +122,7 @@ export function TestimonialSlider() {
         <div className="mt-6 flex items-center justify-center gap-4">
           <button
             onClick={prev}
-            aria-label="Testimonio anterior"
+            aria-label={t('testimonials.aria.prev')}
             disabled={current === 0}
             className="rounded-full p-2 text-neutral hover:bg-neutral/10 disabled:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
@@ -152,13 +132,13 @@ export function TestimonialSlider() {
           </button>
 
           {/* Dots */}
-          <div role="tablist" aria-label="Navegar entre testimonios" className="flex gap-2">
-            {TESTIMONIALS.map((t, i) => (
+          <div role="tablist" aria-label={t('testimonials.aria.dots')} className="flex gap-2">
+            {TESTIMONIALS.map((item, i) => (
               <button
-                key={t.id}
+                key={item.id}
                 role="tab"
                 aria-selected={i === current}
-                aria-label={`Testimonio ${i + 1}`}
+                aria-label={t('testimonials.aria.item', { n: i + 1 })}
                 onClick={() => goTo(i)}
                 className={`h-2 rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
                   i === current ? 'w-6 bg-primary' : 'w-2 bg-neutral/30'
@@ -169,7 +149,7 @@ export function TestimonialSlider() {
 
           <button
             onClick={next}
-            aria-label="Siguiente testimonio"
+            aria-label={t('testimonials.aria.next')}
             disabled={current === TESTIMONIALS.length - 1}
             className="rounded-full p-2 text-neutral hover:bg-neutral/10 disabled:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >

@@ -1,6 +1,8 @@
+import { Fragment } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
+import { useLanguage } from '@/context/LanguageContext'
 import HomePage from '@/pages/Home'
 import LibraryPage from '@/pages/Library'
 import SiteDetailPage from '@/pages/Library/SiteDetail'
@@ -14,11 +16,15 @@ import QuizFlow from '@/pages/Quiz/QuizFlow'
 import QuizResult from '@/pages/Quiz/QuizResult'
 
 export default function App() {
+  const { language, t } = useLanguage()
+
   return (
-    <>
+    // key={language.code} fuerza un remount limpio al cambiar de idioma:
+    // re-evalúa todos los t(), re-divide los SplitHeading y re-inicializa GSAP.
+    <Fragment key={language.code}>
       {/* Skip link — accesibilidad por teclado */}
       <a href="#main-content" className="skip-link">
-        Ir al contenido principal
+        {t('common.skipToContent')}
       </a>
 
       <Navbar />
@@ -42,16 +48,14 @@ export default function App() {
             <main className="flex min-h-screen items-center justify-center bg-background pt-20">
               <div className="text-center px-4">
                 <h1 className="font-serif text-display-lg font-bold text-dark mb-4">
-                  Página no encontrada
+                  {t('notfound.title')}
                 </h1>
-                <p className="mb-8 text-neutral font-sans">
-                  La página que buscás no existe.
-                </p>
+                <p className="mb-8 text-neutral font-sans">{t('notfound.body')}</p>
                 <a
                   href="/"
                   className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-surface hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                 >
-                  Volver al inicio
+                  {t('notfound.back')}
                 </a>
               </div>
             </main>
@@ -60,6 +64,6 @@ export default function App() {
       </Routes>
 
       <Footer />
-    </>
+    </Fragment>
   )
 }

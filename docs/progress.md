@@ -668,6 +668,56 @@ Agregar `setGlobalPrefix('api')` habría roto esos 35 tests y el healthcheck.
 
 ---
 
+## Cambios del 27/06/2026 — Sesión 6: Internacionalización (i18n) de la UI
+
+**Objetivo:** que seleccionar un idioma en el selector del Navbar cambie el idioma de
+**toda la web**. Antes el selector solo guardaba el idioma en contexto (se pasaba como
+`idioma` a la IA), pero el texto de la UI estaba hardcodeado en español.
+
+### Enfoque (decisión del usuario: "Infra + ES/EN, resto pluggable")
+
+Motor i18n propio, ligero y sin dependencias. Traducción completa de **ES (origen) + EN**;
+los otros 38 idiomas del selector caen con elegancia a EN, y agregar uno nuevo es soltar
+un archivo en `src/i18n/locales/`.
+
+### Archivos nuevos
+
+| Archivo | Rol |
+|---|---|
+| `src/i18n/index.ts` | Motor: `makeT()` con interpolación `{var}`, cadena de fallback (locale → en → es → clave), resolución de código (`pt-BR`→`pt`→`en`), `dirFor()` (RTL: ar/he/fa/ur), `isFullyTranslated()` |
+| `src/i18n/locales/es.ts` | Diccionario de origen (Español) — ~150 claves |
+| `src/i18n/locales/en.ts` | Diccionario Inglés (fallback universal) |
+
+### Cambios clave
+
+- **`src/context/LanguageContext.tsx`** — ahora expone `t` y `dir`; persiste el idioma en
+  `localStorage('munay-lang')`; sincroniza `<html lang>` y `<html dir>` en cada cambio.
+  Atajo `useT()` para componentes que solo traducen.
+- **`src/App.tsx`** — el subárbol se envuelve en `<Fragment key={language.code}>`: al cambiar
+  de idioma se hace **remount limpio** (re-evalúa `t()`, re-divide los `SplitHeading` y
+  re-inicializa GSAP, evitando el conflicto entre la manipulación manual del DOM y React).
+- **Componentes refactorizados a `t()`:** Navbar, LanguageSwitcher, Footer, Home + sus
+  secciones (CountryMaskHero, CinematicSky, JourneySteps, TwoColumnsRagged, StatsCounter,
+  EditorialText, TestimonialSlider), QuizFlow y QuizResult, y la página 404.
+
+### Alcance / límites (consistente con la opción elegida)
+
+- **Contenido dinámico del backend** (preguntas del quiz, `perfilViajero`, textos del
+  itinerario, tips) sigue viniendo en español del NestJS — esa traducción es responsabilidad
+  del mecanismo `idioma`/Gemini, no de la i18n de la UI. La **UI/chrome** sí cambia por completo.
+- **Páginas Library/About/Camera (cuerpos):** su Navbar/Footer ya traduce; los textos internos
+  siguen el mismo patrón `useT()` y se agregan con sus claves cuando se prioricen.
+
+### Verificación post-sesión 6 (27/06/2026)
+
+- **Typecheck:** `tsc -b` exit 0 · **Vitest 22/22** · `vite build` limpio
+- **Navegador (Playwright):** ES→EN cambia Navbar/Footer/Home por completo; `<html lang>`
+  pasa de `es` a `en`; **persistencia** confirmada tras recargar (`localStorage`);
+  **RTL** confirmado (Árabe → `dir=rtl`, con fallback de texto a EN); **sin errores de consola**
+
+
+---
+
 ## Backend NestJS — Completado el 26 de junio de 2026
 
 ### Tecnologías
