@@ -1,11 +1,10 @@
 import { useQuery, queryOptions } from '@tanstack/react-query'
 import type { Site, SiteFilters } from '@/types'
-import { USE_MOCK_DATA } from '@/lib/featureFlags'
 
-// Importa la implementación correcta según el flag
-const { getSites: getSitesFn, getSiteById: getSiteByIdFn } = USE_MOCK_DATA
-  ? await import('@/services/mock/sites')
-  : await import('@/services/api/sites')
+// El catálogo siempre usa los datos mock locales (70+ sitios bolivianos).
+// El backend NestJS tiene su propio catálogo limitado de 13 sitios;
+// mientras no esté sincronizado con el mock completo, forzamos mock aquí.
+import { getSites as getSitesFn, getSiteById as getSiteByIdFn } from '@/services/mock/sites'
 
 // ─── Query Options (type-safe, reutilizables) ─────────────────────────────
 

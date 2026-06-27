@@ -12,7 +12,12 @@ export async function getSites(filters?: SiteFilters): Promise<Site[]> {
   let results = [...SITES_MOCK]
 
   if (filters?.departamento && filters.departamento !== 'todos') {
-    results = results.filter((s) => s.departamento === filters.departamento)
+    // Entries like 'Oruro / La Paz' or 'Todo Bolivia' should appear in any of their departments
+    results = results.filter((s) =>
+      s.departamento === filters.departamento ||
+      s.departamento === 'Todo Bolivia' ||
+      s.departamento.includes(filters.departamento as string)
+    )
   }
 
   if (filters?.categoria && filters.categoria !== 'todas') {

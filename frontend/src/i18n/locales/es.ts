@@ -34,9 +34,9 @@ export const es: Dict = {
   'footer.madeWith': 'Hecho con cariño para los 9 departamentos de Bolivia',
 
   // ─── Home: problema ─────────────────────────────────────────────────────────
-  'home.problem.title': 'El problema que resolvemos',
+  'home.problem.title': 'Bolivia, un tesoro sin descubrir',
   'home.problem.body':
-    'Bolivia tiene un patrimonio cultural inmenso, pero la barrera del idioma y la falta de guías especializados impiden que los turistas internacionales accedan a la riqueza de cada lugar. Munay Map elimina esa barrera: cualquier turista, en cualquier idioma, puede entender la historia que tiene frente a sus ojos.',
+    'Bolivia posee una riqueza cultural inmensa con más de 300 danzas típicas tradicionales, decenas de platos bandera y miles de destinos históricos, pero la fragmentación de la información impide que el turista descubra este tesoro. Munay Map elimina esa barrera: centraliza toda nuestra diversidad cultural en una sola plataforma, permitiendo que cualquier viajero entienda el origen de lo que come, baila y visita en tiempo real.',
 
   // ─── Home: marquees ─────────────────────────────────────────────────────────
   'home.tech.aria': 'Tecnologías utilizadas',

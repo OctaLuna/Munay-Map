@@ -41,7 +41,7 @@ describe('getQuizRecommendation — tag matching', () => {
 
     const result = await getQuizRecommendation({ respuestas, idioma: 'es' })
 
-    const salarEnLugares = result.lugares.some((s) => s.id === 'salar-uyuni')
+    const salarEnLugares = result.lugares.some((s) => s.id === 'salar-de-uyuni')
     expect(salarEnLugares).toBe(true)
   })
 

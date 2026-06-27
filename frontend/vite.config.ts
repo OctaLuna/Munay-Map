@@ -75,6 +75,12 @@ export default defineConfig({
   },
   server: {
     proxy: {
+      '/tts': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        proxyTimeout: 30000,
+        timeout: 30000,
+      },
       '/recognize': {
         target: 'http://localhost:3000',
         changeOrigin: true,

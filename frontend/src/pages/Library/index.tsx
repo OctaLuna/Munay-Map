@@ -25,6 +25,7 @@ const CATEGORIAS: Array<{ value: SiteCategoria | 'todas'; label: string }> = [
   { value: 'sitio_turistico', label: 'Sitios turísticos' },
   { value: 'gastronomia', label: 'Gastronomía' },
   { value: 'danza', label: 'Danzas' },
+  { value: 'danza_folklore', label: 'Danzas y Folklore' },
   { value: 'tradicion_festividad', label: 'Tradiciones y festividades' },
 ]
 
@@ -32,6 +33,7 @@ const CATEGORIA_LABEL: Record<string, string> = {
   sitio_turistico: 'Sitio turístico',
   gastronomia: 'Gastronomía',
   danza: 'Danza',
+  danza_folklore: 'Danza y Folklore',
   tradicion_festividad: 'Tradición',
 }
 

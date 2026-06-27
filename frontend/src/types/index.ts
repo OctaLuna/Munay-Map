@@ -16,6 +16,7 @@ export type SiteCategoria =
   | 'sitio_turistico'
   | 'gastronomia'
   | 'danza'
+  | 'danza_folklore'
   | 'tradicion_festividad'
 
 export type Departamento =
@@ -28,6 +29,10 @@ export type Departamento =
   | 'Pando'
   | 'Tarija'
   | 'Chuquisaca'
+  | 'Todo Bolivia'
+  | 'Oruro / La Paz'
+  | 'La Paz / Cochabamba'
+  | 'Santa Cruz / Pando'
 
 export interface Coordenadas {
   lat: number
@@ -82,6 +87,23 @@ export interface RecognizeResponse {
   idioma: string
   audioUrl: string | null
   confianza: number // 0–1, para decidir si mostrar NotRecognized
+  // Campos enriquecidos opcionales (demo hardcodeado y futuro backend)
+  ubicacion?: {
+    descripcion: string
+    comoLlegar: string
+    altitudMetros?: number
+    distanciaLaPaz?: string
+  }
+  datosImportantes?: string[]
+  datosCuriosos?: string[]
+  mejorEpoca?: {
+    meses: string
+    descripcion: string
+  }
+  entrada?: {
+    precio: string
+    horario: string
+  }
 }
 
 // ---------------------------------------------------------------------------
